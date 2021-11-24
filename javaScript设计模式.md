@@ -67,35 +67,43 @@ javascript 的反模式例子如下：
 
 ### 第五章：JavaScript 设计模式的分类
 
-1. 创建型设计模式：
+#### 1.创建型设计模式：
 
-   创建型设计模式关注于对象创建的机制方法；通过该方法，对象以适应工作环境的方式被创建。基本的对象创建方法可能会给项目增加额外的复杂性，而这些模式的目的就是为了通过控制创建过程解决这个问题；
+创建型设计模式关注于对象创建的机制方法；通过该方法，对象以适应工作环境的方式被创建。基本的对象创建方法可能会给项目增加额外的复杂性，而这些模式的目的就是为了通过控制创建过程解决这个问题；
 
-   - **构造器模式**（Constructor）
-   - **工厂模式**（Factory）
-   - **抽象工厂模式**（Abstract）
-   - **原型模式**（Prototype）
-   - **单例模式**（Singleton）
-   - **建造者模式**（Builder）
+- **构造器模式**（Constructor）
+- **工厂模式**（Factory）
+- **抽象工厂模式**（Abstract）
+- **原型模式**（Prototype）
+- **单例模式**（Singleton）
+- **建造者模式**（Builder）
 
-2. 结构型设计模式：
+#### 2.结构型设计模式：
 
-   结构模式关注于对象组成和通常识别的方式实现不同对象之间的关系。该模式有助于在系统的某一部分发生改变的时候，整个系统结构不需要改变。该模式同样有助于系统中某个部分没有达到某一目的的部分进行重组；
+结构模式关注于对象组成和通常识别的方式实现不同对象之间的关系。该模式有助于在系统的某一部分发生改变的时候，整个系统结构不需要改变。该模式同样有助于系统中某个部分没有达到某一目的的部分进行重组；
 
-   - **装饰模式**
-   - **外观模式**
-   - **享元模式**
-   - **适配器模式**
-   - **代理模式**
+- **装饰器模式**（Decorator）
+- **外观模式**（Facada）
+- **享元模式**（Flyweight）
+- **适配器模式**（Adapter）
+- **代理模式**（Proxy）
+- **桥接模式**（Bridge）
+- **组合模式**（Composite）
 
-1. 行为型设计模式：
+#### 3.行为型设计模式：
 
-   行为模式关注改善或精简在系统中不同对象间通信；
+行为模式关注改善或精简在系统中不同对象间通信；
 
-   - **迭代模式**
-   - **中介者模式**
-   - **观察者模式**
-   - **访问者模式**
+- **迭代模式**（Iterator）
+- **中介者模式**（Mediator）
+- **观察者模式**（Observer）
+- **访问者模式**（Visitor）
+- **解释器模式**（Interpreter）
+- **模版方法**（Template Method）
+- **响应链**（Chain of Responsibility）
+- **命令**（Command）
+- **状态**（State）
+- **策略**（Strategy）
 
 ### 第六章：JavaScript 设计模式分类概览表
 
@@ -135,6 +143,298 @@ javascript 的反模式例子如下：
 | Visitor（访问者）                 | 为类增加新的操作而不改变类本身。                             |
 
 ### 第七章：JavaScript 构造器模式
+
+在面向对象编程中，构造器是个当新建对象的内存被分配后，用来初始化该对象的一个特殊函数。
+
+对象构造器是被用来创建特殊类型的对象的，首先它要准备使用对象，其次在对象初次被创建时，通过接受参数，构造器要用来对成员的属性和方法进行赋值。
+
+#### 1.**对象创建**：
+
+创建对象的三种基本方式：
+
+```javascript
+// 字面量的创建对象
+var newObject = {};
+
+// 通过 Object.create() 方法创建对象
+var newObject = Object.create( null );
+
+// 通过关键字 new 构造器，创建对象
+// "Object"构造器创建了一个针对特殊值的对象包装，只不过这里没有传值给它，所以它将会返回一个空对象。
+var newObject = new Object();
+```
+
+四种方式可以将一个键值对赋给一个对象：
+
+```javascript
+// ECMAScript 3 兼容形式
+// 1\. “.点号”法
+// 设置属性
+newObject.someKey = "Hello World";
+// 获取属性
+var key = newObject.someKey;
+
+// 2\. “[]方括号”法
+// 设置属性
+newObject["someKey"] = "Hello World";
+// 获取属性
+var key = newObject["someKey"];
+
+// ECMAScript 5 仅兼容性形式
+// 3\. Object.defineProperty方式
+// 设置属性
+Object.defineProperty( newObject, "someKey", {
+    value: "for more control of the property's behavior",
+    writable: true,
+    enumerable: true,
+    configurable: true
+});
+// 如果上面的方式你感到难以阅读，可以简短的写成下面这样：
+var defineProp = function ( obj, key, value ){
+  config.value = value;
+  Object.defineProperty( obj, key, config );
+};
+// 为了使用它，我们要创建一个“person”对象
+var person = Object.create( null );
+// 用属性构造对象
+defineProp( person, "car",  "Delorean" );
+defineProp( person, "dateOfBirth", "1981" );
+defineProp( person, "hasBeard", false );
+
+// 4\. Object.defineProperties方式
+// 设置属性
+Object.defineProperties( newObject, {
+  "someKey": { 
+    value: "Hello World", 
+    writable: true 
+  },
+  "anotherKey": { 
+    value: "Foo bar", 
+    writable: false 
+  } 
+});
+
+// 3和4中的读取属行可用1和2中的任意一种
+```
+
+这些方法会被用于继承：
+
+```javascript
+// 创建一个继承与Person的赛车司机
+var driver = Object.create( person );
+// 设置司机的属性
+defineProp(driver, "topSpeed", "100mph");
+// 获取继承的属性 (1981)
+console.log( driver.dateOfBirth );
+// 获取我们设置的属性 (100mph)
+console.log( driver.topSpeed );
+```
+
+#### 2.**基础构造器**：
+
+javascript 不支持类的概念，但它有一种与对象一起工作的构造器函数，使用 new 关键字来调用该函数，我们可以告诉 javascript 把这个函数当做一个构造器来用，它可以用自己所定义的成员来初始化一个对象。
+
+在这个构造器内部，关键字 **this** 引用到刚被创建的对象。
+
+```javascript
+function Car (model, year, miles){
+  this.model = model;
+  this.year = year;
+  this.miles = miles;
+  this.toString = function () {
+    return this.model + "has done" + this.miles + "miles";
+  }
+}
+// 可以实例化一个 Car
+var civic = new Car("Honda Civic", 2008, 20000);
+var mondeo = new Car("Ford Mondeo", 2020, 50000);
+console.log(civic.toString()); // Honda Civichas done20000miles
+console.log(mondeo.toString()); // Ford Mondeohas done50000miles
+```
+
+#### 3.使用**“原型”**的构造器：
+
+在 javascript 中函数有一个 **prototype** 的属性，当我们调用 javascript 的构造器创建一个对象时，构造器函数 prototype 上的属性对于所创建的对象来说都看见；
+
+```javascript
+function Car( model, year, miles ) {
+  this.model = model;
+  this.year = year;
+  this.miles = miles;
+}
+
+// 注意这里我们使用Note here that we are using Object.prototype.newMethod 而不是
+// Object.prototype ，以避免我们重新定义原型对象
+Car.prototype.toString = function () {
+  return this.model + " has done " + this.miles + " miles";
+};
+// 使用:
+var civic = new Car( "Honda Civic", 2009, 20000 );
+var mondeo = new Car( "Ford Mondeo", 2010, 5000 );
+
+console.log( civic.toString() );
+console.log( mondeo.toString() );
+// 通过上面的代码，单个 toString() 实例被所有的 Car 对象所共享来；
+```
+
+### 第八章：JavaScript 模块化模式
+
+模块是任何健壮的应用程序体系结构不可或缺的一部分，特点是有助于保持应用项目的代码单元既能清晰地分离又有组织。
+
+**模块化模式最初被定义为一种对传统软件工程中的类提供私有和公有封装的方法。**
+
+在JavaScript中，模块化模式用来进一步模拟类的概念，通过这样一种方式：我们可以在一个单一的对象中包含**公共**/**私有**的方法和变量，从而从全局范围中屏蔽特定的部分。这个结果是可以减少我们的函数名称与在页面中其他脚本区域定义的函数名称冲突的可能性。
+
+javascript 中实现模块的方式：
+
+- 模块化模式；
+- 对象表示法；
+- AMD 模块；
+- CommonJS 模块；
+- ECMAScript Harmony 模块；
+
+对象字面量：在对象字面值的标记里，一个对象被描述为一组以逗号分隔的名称/值对括在大括号（{}）的集合。对象内部的名称可以是字符串或是标记符后跟着一个冒号":"。在对象里最后一个名称/值对不应该以","为结束符，因为这样会导致错误。
+
+```javascript
+var myObjectLiteral = {
+    variableKey: variableValue,
+    functionKey: function () {
+      // ...
+    };
+};
+var myModule = {
+  myProperty: "someValue",
+  // 对象字面值包含了属性和方法（properties and methods）.
+  // 例如，我们可以定义一个模块配置进对象：
+  myConfig: {
+    useCaching: true,
+    language: "en"
+  },
+  // 非常基本的方法
+  myMethod: function () {
+    console.log( "Where in the world is Paul Irish today?" );
+  },
+  // 输出基于当前配置（<span>configuration</span>）的一个值
+  myMethod2: function () {
+    console.log( "Caching is:" + ( this.myConfig.useCaching ) ? "enabled" : "disabled" );
+  },
+  // 重写当前的配置（configuration）
+  myMethod3: function( newConfig ) {
+
+    if ( typeof newConfig === "object" ) {
+      this.myConfig = newConfig;
+      console.log( this.myConfig.language );
+    }
+  }
+};
+// 输出: Where in the world is Paul Irish today?
+myModule.myMethod();
+// 输出: enabled
+myModule.myMethod2();
+// 输出: fr
+myModule.myMethod3({
+  language: "fr",
+  useCaching: false
+});
+```
+
+- 优势：
+
+  既然我们已经看到单例模式很有用，为什么还是使用模块模式呢？首先，对于有面向对象背景的开发者来讲，至少从javascript语言上来讲，模块模式相对于真正的封装概念更清晰。
+
+  其次，模块模式支持私有数据-因此，在模块模式中，公共部分代码可以访问私有数据，但是在模块外部，不能访问类的私有部分。
+
+- 缺点：
+
+  模块模式的缺点是因为我们采用不同的方式访问公有和私有成员，因此当我们想要改变这些成员的可见性的时候，我们不得不在所有使用这些成员的地方修改代码。
+
+  我们也不能在对象之后添加的方法里面访问这些私有变量。也就是说，很多情况下，模块模式很有用，并且当使用正确的时候，潜在地可以改善我们代码的结构。
+
+  其它缺点包括不能为私有成员创建自动化的单元测试，以及在紧急修复bug时所带来的额外的复杂性。根本没有可能可以对私有成员打补丁。相反地，我们必须覆盖所有的使用存在bug私有成员的公共方法。开发者不能简单的扩展私有成员，因此我们需要记得，私有成员并非它们表面上看上去那么具有扩展性。
+
+### 第九章：JavaScript 暴露模块模式
+
+既然我们对模块模式已经有一些了解了，让我们看一下改进版本 - Christian Heilmann 的启发式模块模式。 启发式模块模式来自于，当Heilmann对这样一个现状的不满，即当我们想要在一个公有方法中调用另外一个公有方法，或者访问公有变量的时候，我们不得不重复主对象的名称。他也不喜欢模块模式中，当想要将某个成员变成公共成员时，修改文字标记的做法。
+
+因此他工作的结果就是一个更新的模式，在这个模式中，我们可以简单地在私有域中定义我们所有的函数和变量，并且返回一个匿名对象，这个对象包含有一些指针，这些指针指向我们想要暴露出来的私有成员，使这些私有成员公有化。
+
+```javascript
+var myRevealingModule = function () {
+        var privateVar = "Ben Cherry",
+            publicVar  = "Hey there!";
+        function privateFunction() {
+            console.log( "Name:" + privateVar );
+        }
+        function publicSetName( strName ) {
+            privateVar = strName;
+        }
+        function publicGetName() {
+            privateFunction();
+        }
+        // Reveal public pointers to 
+        // private functions and properties
+        return {
+            setName: publicSetName,
+            greeting: publicVar,
+            getName: publicGetName
+        };
+    }();
+
+myRevealingModule.setName( "Paul Kinlan" );
+```
+
+这个模式可以用于将私有函数和属性以更加规范的命名方式展现出来。
+
+```javascript
+var myRevealingModule = function () {
+        var privateCounter = 0;
+        function privateFunction() {
+            privateCounter++;
+        }
+        function publicFunction() {
+            publicIncrement();
+        }
+        function publicIncrement() {
+            privateFunction();
+        }
+        function publicGetCount(){
+          return privateCounter;
+        }
+        // Reveal public pointers to
+        // private functions and properties       
+       return {
+            start: publicFunction,
+            increment: publicIncrement,
+            count: publicGetCount
+        };
+    }();
+myRevealingModule.start();
+```
+
+- 优势：
+
+  这个模式是我们脚本的语法更加一致。同样在模块的最后关于那些函数和变量可以被公共访问也变得更加清晰，增强了可读性。
+
+- 缺点：
+
+  这个模式的一个缺点是如果私有函数需要使用公有函数，那么这个公有函数在需要打补丁的时候就不能被重载。因为私有函数仍然使用的是私有的实现，并且这个模式不能用于公有成员，只用于函数。
+
+  公有成员使用私有成员也遵循上面不能打补丁的规则。
+
+  因为上面的原因，使用暴露式模块模式创建的模块相对于原始的模块模式更容易出问题，因此在使用的时候需要小心。
+
+### 第十章：JavaScript 单例模式：
+
+
+
+
+
+
+
+
+
+
+
 
 
 
