@@ -562,11 +562,281 @@ console.log(sunner.getName());
 
 惰性单例是指的是页面开始加载的时候我们的实例是没有进行创建的，是当我们点击页面的div之后才开始创建实例（按需创建），这可以提高我们的网页性能，加快我们的页面渲染速度；
 
-### 第十一章：观察者模式
+### 第十一章：JavaScript 观察者模式
 
+观察者模式是这样一种设计模式。一个被称作被观察者的对象，维护一组被称为观察者的对象，这些对象依赖于被观察者，被观察者自动将自身的状态的任何变化通知给它们。
 
+观察者模式实现包含的组件：
 
+- 被观察者：维护一组观察者，提供用于增加移除观察者的方法；
+- 观察者：提供一个更新接口，用于当被观察者状态变化时，得到通知；
+- 具体的被观察者：状态变化时广播通知给观察者，保持具体的观察者的信息；
+- 具体的观察者：保持一个指向具体被观察者的引用，实现一个更新接口，用于观察，以便保证自身状态总是和被观察者状态一致的；
 
+```javascript
+// 首先，让我们对被观察者可能有的一组依赖其的观察者进行建模：
+function ObserverList(){
+  this.observerList = [];
+}
+
+ObserverList.prototype.Add = function( obj ){
+  return this.observerList.push( obj );
+};
+
+ObserverList.prototype.Empty = function(){
+  this.observerList = [];
+};
+
+ObserverList.prototype.Count = function(){
+  return this.observerList.length;
+};
+
+ObserverList.prototype.Get = function( index ){
+  if( index > -1 && index < this.observerList.length ){
+    return this.observerList[ index ];
+  }
+};
+
+ObserverList.prototype.Insert = function( obj, index ){
+  var pointer = -1;
+
+  if( index === 0 ){
+    this.observerList.unshift( obj );
+    pointer = index;
+  }else if( index === this.observerList.length ){
+    this.observerList.push( obj );
+    pointer = index;
+  }
+
+  return pointer;
+};
+
+ObserverList.prototype.IndexOf = function( obj, startIndex ){
+  var i = startIndex, pointer = -1;
+
+  while( i < this.observerList.length ){
+    if( this.observerList[i] === obj ){
+      pointer = i;
+    }
+    i++;
+  }
+
+  return pointer;
+};
+
+ObserverList.prototype.RemoveAt = function( index ){
+  if( index === 0 ){
+    this.observerList.shift();
+  }else if( index === this.observerList.length -1 ){
+    this.observerList.pop();
+  }
+};
+
+// Extend an object with an extension
+function extend( extension, obj ){
+  for ( var key in extension ){
+    obj[key] = extension[key];
+  }
+}
+
+// 接着，我们对被观察者以及其增加，删除，通知在观察者列表中的观察者的能力进行建模：
+function Subject(){
+  this.observers = new ObserverList();
+}
+
+Subject.prototype.AddObserver = function( observer ){
+  this.observers.Add( observer );
+}; 
+
+Subject.prototype.RemoveObserver = function( observer ){
+  this.observers.RemoveAt( this.observers.IndexOf( observer, 0 ) );
+}; 
+
+Subject.prototype.Notify = function( context ){
+  var observerCount = this.observers.Count();
+  for(var i=0; i < observerCount; i++){
+    this.observers.Get(i).Update( context );
+  }
+};
+
+// 我们接着定义建立新的观察者的一个框架。这里的update 函数之后会被具体的行为覆盖。
+// The Observer
+function Observer(){
+  this.Update = function(){
+    // ...
+  };
+}
+```
+
+观察者模式和 发布/订阅模式的不同：
+
+观察者模式要求想要接受相关通知的观察者必须到发起这个事件的被观察者上注册这个事件；
+
+发布/订阅模式使用一个主题/事件频道，这个频道处于想要获取通知的订阅者和发起事件的发布者之间。这个事件系统允许代码定义应用相关的事件，这个事件可以传递特殊的参数，参数中包含有订阅者所需要的值。这种想法是为了避免订阅者和发布者之间的依赖性。
+
+这种和观察者模式之间的不同，使订阅者可以实现一个合适的事件处理函数，用于注册和接受由发布者广播的相关通知；
+
+这里给出一个关于如何使用发布者/订阅者模式的例子，这个例子中完整地实现了功能强大的publish(), subscribe() 和 unsubscribe()。
+
+```javascript
+// 一个非常简单的邮件处理器
+
+// 接受的消息的计数器
+var mailCounter = 0;
+
+// 初始化一个订阅者，这个订阅者监听名叫"inbox/newMessage" 的频道
+
+// 渲染新消息的粗略信息
+var subscriber1 = subscribe( "inbox/newMessage", function( topic, data ) {
+
+  // 日志记录主题，用于调试
+  console.log( "A new message was received: ", topic );
+
+  // 使用来自于被观察者的数据，用于给用户展示一个消息的粗略信息
+  $( ".messageSender" ).html( data.sender );
+  $( ".messagePreview" ).html( data.body );
+
+});
+
+// 这是另外一个订阅者，使用相同的数据执行不同的任务
+
+// 更细计数器，显示当前来自于发布者的新信息的数量
+var subscriber2 = subscribe( "inbox/newMessage", function( topic, data ) {
+  $('.newMessageCounter').html( mailCounter++ );
+});
+
+publish( "inbox/newMessage", [{
+  sender:"hello@google.com",
+  body: "Hey there! How are you doing today?"
+}]);
+
+// 在之后，我们可以让我们的订阅者通过下面的方式取消订阅来自于新主题的通知
+// unsubscribe( subscriber1,  );
+// unsubscribe( subscriber2 );
+```
+
+这个例子的更广的意义是对松耦合的原则的一种推崇。不是一个对象直接调用另外一个对象的方法，而是通过订阅另外一个对象的一个特定的任务或者活动，从而在这个任务或者活动出现的时候的得到通知。
+
+- 优势：
+
+  观察者和发布/订阅模式鼓励人们认真考虑应用不同部分之间的关系，同时帮助我们找出这样的层，该层中包含有直接的关系，这些关系可以通过一些列的观察者和被观察者来替换掉。这中方式可以有效地将一个应用程序切割成小块，这些小块耦合度低，从而改善代码的管理，以及用于潜在的代码复用。
+
+  使用观察者模式更深层次的动机是，当我们需要维护相关对象的一致性的时候，我们可以避免对象之间的紧密耦合。例如，一个对象可以通知另外一个对象，而不需要知道这个对象的信息。
+
+  两种模式下，观察者和被观察者之间都可以存在动态关系。这提供很好的灵活性，而当我们的应用中不同的部分之间紧密耦合的时候，是很难实现这种灵活性的。
+
+  尽管这些模式并不是万能的灵丹妙药，这些模式仍然是作为最好的设计松耦合系统的工具之一，因此在任何的JavaScript 开发者的工具箱里面，都应该有这样一个重要的工具。
+
+- 缺点：
+
+  事实上，这些模式的一些问题实际上正是来自于它们所带来的一些好处。在发布/订阅模式中，将发布者共订阅者上解耦，将会在一些情况下，导致很难确保我们应用中的特定部分按照我们预期的那样正常工作。
+
+  例如，发布者可以假设有一个或者多个订阅者正在监听它们。比如我们基于这样的假设，在某些应用处理过程中来记录或者输出错误日志。如果订阅者执行日志功能崩溃了（或者因为某些原因不能正常工作），因为系统本身的解耦本质，发布者没有办法感知到这些事情。
+
+  另外一个这种模式的缺点是，订阅者对彼此之间存在没有感知，对切换发布者的代价无从得知。因为订阅者和发布者之间的动态关系，更新依赖也很能去追踪。
+
+**发布 / 订阅实现**：
+
+发布/订阅在JavaScript的生态系统中非常合适，主要是因为作为核心的ECMAScript 实现是事件驱动的。尤其是在浏览器环境下更是如此，因为DOM使用事件作为其主要的用于脚本的交互API。
+
+也就是说，无论是ECMAScript 还是DOM都没有在实现代码中提供核心对象或者方法用于创建定制的事件系统（DOM3 的CustomEvent是一个例外，这个事件绑定在DOM上，因此通常用处不大）。
+
+幸运的是，流行的JavaScript库例如dojo, jQuery(定制事件)以及YUI已经有相关的工具，可以帮助我们方便的实现一个发布/订阅者系统。
+
+```javascript
+// 发布
+
+// jQuery: $(obj).trigger("channel", [arg1, arg2, arg3]);
+$( el ).trigger( "/login", [{username:"test", userData:"test"}] );
+
+// Dojo: dojo.publish("channel", [arg1, arg2, arg3] );
+dojo.publish( "/login", [{username:"test", userData:"test"}] );
+
+// YUI: el.publish("channel", [arg1, arg2, arg3]);
+el.publish( "/login", {username:"test", userData:"test"} );
+
+// 订阅
+
+// jQuery: $(obj).on( "channel", [data], fn );
+$( el ).on( "/login", function( event ){...} );
+
+// Dojo: dojo.subscribe( "channel", fn);
+var handle = dojo.subscribe( "/login", function(data){..} );
+
+// YUI: el.on("channel", handler);
+el.on( "/login", function( data ){...} );
+
+// 取消订阅
+
+// jQuery: $(obj).off( "channel" );
+$( el ).off( "/login" );
+
+// Dojo: dojo.unsubscribe( handle );
+dojo.unsubscribe( handle );
+
+// YUI: el.detach("channel");
+el.detach( "/login" );
+```
+
+**发布 / 订阅实例**：
+
+```javascript
+var pubsub = {};
+
+(function(q) {
+    var topics = {}, subUid = -1;
+    // Publish or broadcast events of interest
+    // with a specific topic name and arguments
+    // such as the data to pass along
+    q.publish = function( topic, args ) {
+        if ( !topics[topic] ) {
+            return false;
+        }
+        var subscribers = topics[topic], len = subscribers ? subscribers.length : 0;
+        while (len--) {
+            subscribers[len].func( topic, args );
+        }
+        return this;
+    };
+
+    // Subscribe to events of interest
+    // with a specific topic name and a
+    // callback function, to be executed
+    // when the topic/event is observed
+    q.subscribe = function( topic, func ) {
+        if (!topics[topic]) {
+            topics[topic] = [];
+        }
+        var token = ( ++subUid ).toString();
+        topics[topic].push({
+            token: token,
+            func: func
+        });
+        return token;
+    };
+
+    // Unsubscribe from a specific
+    // topic, based on a tokenized reference
+    // to the subscription
+    q.unsubscribe = function( token ) {
+        for ( var m in topics ) {
+            if ( topics[m] ) {
+                for ( var i = 0, j = topics[m].length; i < j; i++ ) {
+                    if ( topics[m][i].token === token) {
+                        topics[m].splice( i, 1 );
+                        return token;
+                    }
+                }
+            }
+        }
+        return this;
+    };
+}( pubsub ));
+```
+
+观察者模式在应用设计中，解耦一系列不同的场景上非常有用，如果你没有用过它，我推荐你尝试一下今天提到的之前写到的某个实现。这个模式是一个易于学习的模式，同时也是一个威力巨大的模式。
+
+### 第十二章：JavaScript 中介者模式
 
 
 
