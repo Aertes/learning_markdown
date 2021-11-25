@@ -1109,9 +1109,57 @@ module.facade( {run: true, val:10} );
 
 ### 第十六章：JavaScript 工厂模式
 
+工厂模式是另外一种关注对象创建概念的创建模式。它的领域中同其它模式的不同之处在于它并没有明确要求我们使用一个构造器。取而代之，一个工厂能提供一个创建对象的公共接口，我们可以在其中指定我们希望被创建的工厂对象的类型。
 
+- 何时使用工厂模式：
+  1. 当我们的对象或者组件设置涉及到高程度级别的复杂度时。
+  2. 当我们需要根据我们所在的环境方便的生成不同对象的实体时。
+  3. 当我们在许多共享同一个属性的许多小型对象或组件上工作时。
+  4. 当带有其它仅仅需要满足一种API约定(又名鸭式类型)的对象的组合对象工作时.这对于解耦来说是有用的。
+- 何时不要去使用工厂模式：
+  1. 当被应用到错误的问题类型上时,这一模式会给应用程序引入大量不必要的复杂性.除非为创建对象提供一个接口是我们编写的库或者框架的一个设计上目标,否则我会建议使用明确的构造器,以避免不必要的开销。
+  2. 由于对象的创建过程被高效的抽象在一个接口后面的事实,这也会给依赖于这个过程可能会有多复杂的单元测试带来问题。
 
+抽象工厂：
 
+了解抽象工厂模式也是非常实用的,它的目标是以一个通用的目标将一组独立的工厂进行封装.它将一堆对象的实现细节从它们的一般用例中分离。
+
+抽象工厂应该被用在一种必须从其创建或生成对象的方式处独立,或者需要同多种类型的对象一起工作,这样的系统中。
+
+简单且容易理解的例子就是一个发动机工厂,它定义了获取或者注册发动机类型的方式.抽象工厂会被命名为AbstractVehicleFactory.抽象工厂将允许像"car"或者"truck"的发动机类型的定义,并且构造工厂将仅实现满足发动机合同的类.(例如:Vehicle.prototype.driven和Vehicle.prototype.breakDown)。
+
+```javascript
+var AbstractVehicleFactory = (function () {
+    // Storage for our vehicle types
+    var types = {};
+    return {
+        getVehicle: function ( type, customizations ) {
+            var Vehicle = types[type];
+            return (Vehicle ? new Vehicle(customizations) : null);
+        },
+        registerVehicle: function ( type, Vehicle ) {
+            var proto = Vehicle.prototype;
+            // only register classes that fulfill the vehicle contract
+            if ( proto.drive && proto.breakDown ) {
+                types[type] = Vehicle;
+            }
+            return AbstractVehicleFactory;
+        }
+    };
+})();
+
+// Usage:
+AbstractVehicleFactory.registerVehicle( "car", Car );
+AbstractVehicleFactory.registerVehicle( "truck", Truck );
+
+// Instantiate a new car based on the abstract vehicle type
+var car = AbstractVehicleFactory.getVehicle( "car" , { color: "lime green", state: "like new" } );
+
+// Instantiate a new truck in a similar manner
+var truck = AbstractVehicleFactory.getVehicle( "truck" , { wheelSize: "medium", color: "neon yellow" } );
+```
+
+### 第十七章：JavaScript Mixin模式：
 
 
 
