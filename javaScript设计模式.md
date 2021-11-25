@@ -838,6 +838,95 @@ var pubsub = {};
 
 ### 第十二章：JavaScript 中介者模式
 
+从实现角度来讲，中介者模式是观察者模式中的共享被观察者对象。在这个系统中的对象之间直接的发布/订阅关系被牺牲掉了，取而代之的是维护一个通信的中心节点。
+
+- 基础的实现：
+
+  中介者模式的一种简单的实现可以在下面找到,publish()和subscribe()方法都被暴露出来使用:
+
+```javascript
+var mediator = (function(){
+    // Storage for topics that can be broadcast or listened to
+    var topics = {};
+    // Subscribe to a topic, supply a callback to be executed
+    // when that topic is broadcast to
+    var subscribe = function( topic, fn ){
+        if ( !topics[topic] ){
+          topics[topic] = [];
+        }
+        topics[topic].push( { context: this, callback: fn } );
+        return this;
+    };
+
+    // Publish/broadcast an event to the rest of the application
+    var publish = function( topic ){
+        var args;
+        if ( !topics[topic] ){
+          return false;
+        }
+        args = Array.prototype.slice.call( arguments, 1 );
+        for ( var i = 0, l = topics[topic].length; i < l; i++ ) {
+            var subscription = topics[topic][i];
+            subscription.callback.apply( subscription.context, args );
+        }
+        return this;
+    };
+    return {
+        publish: publish,
+        subscribe: subscribe,
+        installTo: function( obj ){
+            obj.subscribe = subscribe;
+            obj.publish = publish;
+        }
+    };
+}());
+```
+
+- 高级的实现：
+
+  通过生成对象实体,我们稍后能够简单的更新认购,而不需要去取消注册然后重新注册它们.认购可以写成一个使用被称作一个选项对象或者一个上下文环境的函数；
+
+```javascript
+// Pass in a context to attach our Mediator to.
+// By default this will be the window object
+(function( root ){
+  function guidGenerator() { /*..*/}
+  // Our Subscriber constructor
+  function Subscriber( fn, options, context ){
+    if ( !(this instanceof Subscriber) ) {
+      return new Subscriber( fn, context, options );
+    }else{
+
+      // guidGenerator() is a function that generates
+      // GUIDs for instances of our Mediators Subscribers so
+      // we can easily reference them later on. We're going
+      // to skip its implementation for brevity
+
+      this.id = guidGenerator();
+      this.fn = fn;
+      this.options = options;
+      this.context = context;
+      this.topic = null;
+    }
+  }
+})();
+```
+
+- 优点：
+
+  中介者模式最大的好处就是，它节约了对象或者组件之间的通信信道，这些对象或者组件存在于从多对多到多对一的系统之中。由于解耦合水平的因素，添加新的发布或者订阅者是相对容易的。
+
+- 缺点：
+
+  也许使用这个模式最大的缺点是它可以引入一个单点故障。在模块之间放置一个中间人也可能会造成性能损失，因为它们经常是间接地的进行通信的。由于松耦合的特性，仅仅盯着广播很难去确认系统是如何做出反应的。
+
+- 中间人VS观察者：
+
+  “在观察者模式中，没有封装约束的单一对象”。取而代之，观察者和主题必须合作来维护约束。通信的模式决定于观察者和主题相互关联的方式：一个单独的主题经常有许多的观察者，而有时候一个主题的观察者是另外一个观察者的主题。
+
+  中间人和观察者都提倡松耦合，然而，中间人默认使用让对象严格通过中间人进行通信的方式实现松耦合。观察者模式则创建了观察者对象，这些观察者对象会发布触发对象认购的感兴趣的事件。
+
+### 第十三章：JavaScript 原型模式
 
 
 
