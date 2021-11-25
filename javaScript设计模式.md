@@ -928,6 +928,95 @@ var mediator = (function(){
 
 ### 第十三章：JavaScript 原型模式
 
+真正原型的集成,像ECMAScript 5标准中所定义的那样,需要使用 Object.create(如我们在本节的前面部分所见到的).为了提醒我们自己,Object.create创建了一个拥有特定原型的对象,并且也包含选项式的特定属性.(例如,Object.create(prototype,optionalDescriptorObject))。
+
+```javascript
+var myCar = {
+  name: "Ford Escort",
+  drive: function () {
+    console.log( "Weeee. I'm driving!" );
+  },
+  panic: function () {
+    console.log( "Wait. How do you stop this thing?" );
+  }
+
+};
+
+// Use Object.create to instantiate a new car
+var yourCar = Object.create( myCar );
+
+// Now we can see that one is a prototype of the other
+console.log( yourCar.name );
+```
+
+Object.create也允许我们简单的继承先进的概念,比如对象能够直接继承自其它对象,这种不同的继承.我们早先也看到Object.create允许我们使用 供应的第二个参数来初始化对象属性。
+
+```javascript
+var vehicle = {
+  getModel: function () {
+    console.log( "The model of this vehicle is.." + this.model );
+  }
+};
+
+var car = Object.create(vehicle, {
+  "id": {
+    value: MY_GLOBAL.nextId(),
+    // writable:false, configurable:false by default
+    enumerable: true
+  },
+  "model": {
+    value: "Ford",
+    enumerable: true
+  }
+});
+```
+
+这里的属性可以被Object.create的第二个参数来初始化,使用一种类似于我们前面看到的Object.defineProperties和Object.defineProperties方法所使用语法的对象字面值。
+
+在枚举对象的属性,和(如Crockford所提醒的那样)在一个hasOwnProperty()检查中封装循环的内容时,原型关系会造成麻烦,这一事实是值得我们关注的。
+
+如果我们希望在不直接使用Object.create的前提下实现原型模式,我们可以像下面这样,按照上面的示例,模拟这一模式:
+
+```javascript
+var vehiclePrototype = {
+  init: function ( carModel ) {
+    this.model = carModel;
+  },
+  getModel: function () {
+    console.log( "The model of this vehicle is.." + this.model);
+  }
+};
+
+function vehicle( model ) {
+  function F() {};
+  F.prototype = vehiclePrototype;
+  var f = new F();
+  f.init( model );
+  return f;
+}
+
+var car = vehicle( "Ford Escort" );
+car.getModel();
+
+// 注意:这种可选的方式不允许用户使用相同的方式定义只读的属性(因为如果不小心的话vehicle原型可能会被改变)。
+```
+
+原型模式的最后一种可选实现可以像下面这样:
+
+```javascript
+var beget = (function () {
+    function F() {}
+    return function ( proto ) {
+        F.prototype = proto;
+        return new F();
+    };
+})();
+```
+
+### 第十四章：JavaScript 命令模式
+
+
+
 
 
 
