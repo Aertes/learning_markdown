@@ -1055,11 +1055,59 @@ CarManager.execute( "buyVehicle", "Ford Escort", "34232" );
 
 ### 第十五章：JavaScript 外观模式
 
+这一模式提供了面向一种更大型的代码体提供了一个的更高级别的舒适的接口，隐藏了其真正的潜在复杂性。把这一模式想象成要是呈现给开发者简化的API，一些总是会提升使用性能的东西。
 
+```javascript
+var addMyEvent = function( el,ev,fn ){
+   if( el.addEventListener ){
+            el.addEventListener( ev,fn, false );
+      }else if(el.attachEvent){
+            el.attachEvent( "on" + ev, fn );
+      } else{
+           el["on" + ev] = fn;
+    }
+};
+```
 
+外观模式不仅仅只被用在它们自己身上，它们也能够被用来同其它的模式诸如模块模式进行集成。如我们在下面所看到的，我们模块模式的实体包含许多被定义为私有的方法。外观模式则被用来提供访问这些方法的更加简单的API：
 
+```javascript
+var module = (function() {
+    var _private = {
+        i:5,
+        get : function() {
+            console.log( "current value:" + this.i);
+        },
+        set : function( val ) {
+            this.i = val;
+        },
+        run : function() {
+            console.log( "running" );
+        },
+        jump: function(){
+            console.log( "jumping" );
+        }
+    };
 
+    return {
 
+        facade : function( args ) {
+            _private.set(args.val);
+            _private.get();
+            if ( args.run ) {
+                _private.run();
+            }
+        }
+    };
+}());
+
+// Outputs: "current value: 10" and "running"
+module.facade( {run: true, val:10} );
+```
+
+当使用这个模式的时候，尝试了解任何有关性能上面的消耗，要知道它们是否值得以抽象的级别被提供出来调用。
+
+### 第十六章：JavaScript 工厂模式
 
 
 
