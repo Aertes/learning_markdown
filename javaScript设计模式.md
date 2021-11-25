@@ -1015,6 +1015,54 @@ var beget = (function () {
 
 ### 第十四章：JavaScript 命令模式
 
+命名模式的目标是将方法的调用,请求或者操作封装到一个单独的对象中,给我们酌情执行同时参数化和传递方法调用的能力.另外,它使得我们能将对象从实现了行为的对象对这些行为的调用进行解耦,为我们带来了换出具体的对象这一更深程度的整体灵活性。
+
+具体类是对基于类的编程语言的最好解释,并且同抽象类的理念联系紧密.抽象类定义了一个接口,但并不需要提供对它的所有成员函数的实现.它扮演着驱动其它类的基类角色.被驱动类实现了缺失的函数而被称为具体类. 命令模式背后的一般理念是为我们提供了从任何执行中的命令中分离出发出命令的责任,取而代之将这一责任委托给其它的对象。
+
+```javascript
+(function(){
+  var CarManager = {
+      // request information
+      requestInfo: function( model, id ){
+        return "The information for " + model + " with ID " + id + " is foobar";
+      },
+      // purchase the car
+      buyVehicle: function( model, id ){
+        return "You have successfully purchased Item " + id + ", a " + model;
+      },
+      // arrange a viewing
+      arrangeViewing: function( model, id ){
+        return "You have successfully booked a viewing of " + model + " ( " + id + " ) ";
+      }
+    };
+})();
+
+// 看一看上面的这段代码,它也许是通过直接访问对象来琐碎的调用我们CarManager的方法。在技术上我们也许都会都会对这个没有任何失误达成谅解.它是完全有效的Javascript然而也会有情况不利的情况。
+// 现在让我们来扩展我们的CarManager,以便我们这个命令模式的应用程序得到接下来的这种效果:接受任何可以在CarManager对象上面执行的方法,传送任何可以被使用到的数据,如Car模型和ID。
+CarManager.execute( "buyVehicle", "Ford Escort", "453543" );
+
+// 按照这种结构,我们现在应该像下面这样,添加一个对于"CarManager.execute()"方法的定义：
+CarManager.execute = function ( name ) {
+    return CarManager[name] && CarManager[name].apply( CarManager, [].slice.call(arguments, 1) );
+};
+
+// 最终我们的调用如下所示:
+CarManager.execute( "arrangeViewing", "Ferrari", "14523" );
+CarManager.execute( "requestInfo", "Ford Mondeo", "54323" );
+CarManager.execute( "requestInfo", "Ford Escort", "34232" );
+CarManager.execute( "buyVehicle", "Ford Escort", "34232" );
+```
+
+### 第十五章：JavaScript 外观模式
+
+
+
+
+
+
+
+
+
 
 
 
