@@ -1237,11 +1237,121 @@ myAnimator.stop();
 
   对Mixin的副作用是值得商榷的.一些开发者感觉将功能注入到对象的原型中是一个坏点子,因为它会同时导致原型污染和一定程度上的对我们原有功能的不确定性.在大型的系统中,很可能是有这种情况的。
 
+### 第十八章：JavaScript 装饰器模式
 
+装饰器是旨在提升重用性能的一种结构性设计模式。同Mixin类似，它可以被看作是应用子类划分的另外一种有价值的可选方案。
 
+典型的装饰器提供了向一个系统中现有的类动态添加行为的能力。其创意是装饰本身并不关心类的基础功能，而只是将它自身拷贝到超类之中。
 
+#### 示例1：带有新功能的装饰构造器
 
+```javascript
+// 一个 vehicle 构造器
+function vehicle( vehicleType ){
+    // 默认参数
+    this.vehicleType = vehicleType || "car";
+    this.model = "default";
+    this.license = "00000-000";
+}
 
+// Test instance for a basic vehicle
+var testInstance = new vehicle( "car" );
+console.log( testInstance );
+
+// Outputs:
+// vehicle: car, model:default, license: 00000-000
+
+// Lets create a new instance of vehicle, to be decorated
+var truck = new vehicle( "truck" );
+
+// New functionality we're decorating vehicle with
+truck.setModel = function( modelName ){
+    this.model = modelName;
+};
+
+truck.setColor = function( color ){
+    this.color = color;
+};
+
+// Test the value setters and value assignment works correctly
+truck.setModel( "CAT" );
+truck.setColor( "blue" );
+
+console.log( truck );
+
+// Outputs:
+// vehicle:truck, model:CAT, color: blue
+
+// Demonstrate "vehicle" is still unaltered
+var secondInstance = new vehicle( "car" );
+console.log( secondInstance );
+
+// Outputs:
+// vehicle: car, model:default, license: 00000-000
+```
+
+上面示例，这种类型的简单实现是实用的，但它没有真正展示出装饰能够贡献出来的全部潜能。
+
+#### 示例2：带有多个装饰器的装饰对象
+
+```javascript
+// The constructor to decorate
+function MacBook() {
+  this.cost = function () { return 997; };
+  this.screenSize = function () { return 11.6; };
+}
+
+// Decorator 1
+function Memory( macbook ) {
+  var v = macbook.cost();
+  macbook.cost = function() {
+    return v + 75;
+  };
+}
+
+// Decorator 2
+function Engraving( macbook ){
+  var v = macbook.cost();
+  macbook.cost = function(){
+    return  v + 200;
+  };
+}
+
+// Decorator 3
+function Insurance( macbook ){
+  var v = macbook.cost();
+  macbook.cost = function(){
+     return  v + 250;
+  };
+}
+
+var mb = new MacBook();
+Memory( mb );
+Engraving( mb );
+Insurance( mb );
+
+// Outputs: 1522
+console.log( mb.cost() );
+
+// Outputs: 11.6
+console.log( mb.screenSize() );
+```
+
+在上面的示例中，我们的装饰器重载了超类对象MacBook()的 object.cost()函数，使其返回的Macbook的当前价格加上了被定制后升级的价格。
+
+这被看做是对原来的Macbook对象构造器方法的装饰，它并没有将其重写（例如，screenSize())，我们所定义的Macbook的其它属性也保持不变，完好无缺。
+
+上面的示例并没有真正定义什么接口，而且我们也转移了从创造者到接受者移动时确保一个对象对应一个接口的责任。
+
+- **注意**：装饰模式的这一特殊变体是提供出来做参考用的。如果发现它过于复杂，建议你选择前面更加简单的实现。
+
+- 优点：
+
+  因为它可以被透明的使用，并且也相当的灵活，因此开发者都挺乐意去使用这个模式——如我们所见，对象可以用新的行为封装或者“装饰”起来，而后继续使用，并不用去担心基础的对象被改变。在一个更加广泛的范围内，这一模式也避免了我们去依赖大量子类来实现同样的效果。
+
+- 缺点：
+
+  然而在实现这个模式时，也存在我们应该意识到的缺点。如果穷于管理，它也会由于引入了许多微小但是相似的对象到我们的命名空间中，从而显著的使得我们的应用程序架构变得复杂起来。这里所担忧的是，除了渐渐变得难于管理，其他不能熟练使用这个模式的开发者也可能会有一段要掌握它被使用的理由的艰难时期。
 
 
 
