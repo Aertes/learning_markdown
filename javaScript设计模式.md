@@ -1161,6 +1161,102 @@ var truck = AbstractVehicleFactory.getVehicle( "truck" , { wheelSize: "medium", 
 
 ### 第十七章：JavaScript Mixin模式：
 
+在诸如C++或者List着这样的传统语言中,织入模式就是一些提供能够被一个或者一组子类简单继承功能的类,意在重用其功能。
+
+- 子类划分：
+
+  子类划分是一个参考了为一个新对象继承来自一个基类或者超类对象的属性的术语，在传统的面向对象编程中,类B能够从另外一个类A处扩展，这里我们将A看做是超类，而将B看做是A的子类，如此，所有B的实体都从A处继承了其A的方法，然而B仍然能够定义它自己的方法，包括那些重载的原本在A中的定义的方法。
+
+  B是否应该调用已经被重载的A中的方法，我们将这个引述为方法链，B是否应该调用A(超类)的构造器，我们将这称为构造器链。
+
+  为了演示子类划分，首先我们需要一个能够创建自身新实体的基对象。
+
+```javascript
+// 基础实例对象
+var Person =  function( firstName , lastName ){
+  this.firstName = firstName;
+  this.lastName =  lastName;
+  this.gender = "male";
+};
+var Superhero = function( firstName, lastName , powers ){
+   // 继承 Person 类
+    Person.call( this, firstName, lastName );
+    this.powers = powers;
+};
+// 继承原型链
+SuperHero.prototype = Object.create( Person.prototype );
+var superman = new Superhero( "Clark" ,"Kent" , ["flight","heat-vision"] );
+console.log( superman );
+```
+
+- Mixin(织入目标类)
+
+  在Javascript中,我们会将从Mixin继承看作是通过扩展收集功能的一种途径.我们定义的每一个新的对象都有一个原型,从其中它可以继承更多的属性.原型可以从其他对象继承而来,但是更重要的是,能够为任意数量的对象定义属性.我们可以利用这一事实来促进功能重用。
+
+```javascript
+var myMixins = {
+  moveUp: function(){
+    console.log( "move up" );
+  },
+  moveDown: function(){
+    console.log( "move down" );
+  },
+  stop: function(){
+    console.log( "stop! in the name of love!" );
+  }
+};
+function carAnimator(){
+  this.moveLeft = function(){
+    console.log( "move left" );
+  };
+}
+function personAnimator(){
+  this.moveRandomly = function(){ /*..*/ };
+}
+// 扩展现有构造器功能的原型
+_.extend( carAnimator.prototype, myMixins );
+_.extend( personAnimator.prototype, myMixins );
+var myAnimator = new carAnimator();
+myAnimator.moveLeft();
+myAnimator.moveDown();
+myAnimator.stop();
+
+// Outputs:
+// move left
+// move down
+// stop! in the name of love!
+```
+
+这允许我们将通用的行为轻易的"混"入相当普通对象构造器中。
+
+- 优点：
+
+  Mixin支持在一个系统中降解功能的重复性,增加功能的重用性.在一些应用程序也许需要在所有的对象实体共享行为的地方,我们能够通过在一个Mixin中维护这个共享的功能,来很容易的避免任何重复,而因此专注于只实现我们系统中真正彼此不同的功能。
+
+- 缺点：
+
+  对Mixin的副作用是值得商榷的.一些开发者感觉将功能注入到对象的原型中是一个坏点子,因为它会同时导致原型污染和一定程度上的对我们原有功能的不确定性.在大型的系统中,很可能是有这种情况的。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
