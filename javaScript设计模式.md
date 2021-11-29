@@ -1383,7 +1383,19 @@ jQuery.single = (function( o ){
 });
 ```
 
+## JavaScript MV* 模式
 
+#### 三个非常重要的架构模式：
+
+1. MVC (Model(模型)-View(视图)-Controller(控制器))；
+2. MVP (Model(模型)-View(视图)-Presenter(中介者)) ；
+3. MVVM (Model(模型)-View(视图)-ViewModel(视图模型))；
+
+### 第一章：JavaScript MVC模式
+
+MVC是一个架构设计模式，它通过分离关注点的方式来支持改进应用组织方式。它促成了业务数据(Models)从用户界面(Views)中分离出来，还有第三个组成部分(Controllers)负责管理传统意义上的业务逻辑和用户输入。
+
+当时它起初被称作Model-View-Controller-Editor。
 
 
 
