@@ -2020,9 +2020,252 @@ jQuery代理方法的实现如下：
 
 ### 第七章：JavaScript 建造者模式
 
+处理DOM时，我们常常想要去动态的构建新的元素--这是一个会让我们希望构建的元素最终所包含的标签，属性和参数的复杂性有所增长的过程。
 
+建造器使得我们仅仅只通过定义对象的类型和内容，就可以去构建复杂的对象，为我们屏蔽了明确创造或者展现对象的过程。
 
+下面引用自jQuery内部核心的jQuery.protoype方法，它支持从jQuery对象到传入jQuery()选择器的标签的构造。不管是不是使用document.createElement去创建一个新的元素，都会有一个针对这个元素的引用（找到或者被创建）被注入到返回的对象中，因此进一步会有更多的诸如as.attr()的方法在这之后就可以很容易的在其上使用了。
 
+```javascript
+// HANDLE: $(html) -> $(array)
+  if ( match[1] ) {
+    context = context instanceof jQuery ? context[0] : context;
+    doc = ( context ? context.ownerDocument || context : document );
+
+    // If a single string is passed in and it's a single tag
+    // just do a createElement and skip the rest
+    ret = rsingleTag.exec( selector );
+
+    if ( ret ) {
+      if ( jQuery.isPlainObject( context ) ) {
+        selector = [ document.createElement( ret[1] ) ];
+        jQuery.fn.attr.call( selector, context, true );
+      } else {
+        selector = [ doc.createElement( ret[1] ) ];
+      }
+    } else {
+      ret = jQuery.buildFragment( [ match[1] ], [ doc ] );
+      selector = ( ret.cacheable ? jQuery.clone(ret.fragment) : ret.fragment ).childNodes;
+    }
+    return jQuery.merge( this, selector );
+```
+
+### 第八章：JQuery 插件设计模式
+
+- 简单地向jQuery的jQuery.fn对象添加一个新的功能属性的插件：
+
+```javascript
+$.fn.myPluginName = function () {
+    // our plugin logic
+};
+```
+
+- 对于紧凑性而言这是很棒的，而下面的代码将会是一个更好的构建基础：
+
+```javascript
+(function( $ ){
+  $.fn.myPluginName = function () {
+    // our plugin logic
+  };
+})( jQuery );
+```
+
+- 使用jQuery.extend(),它使得我们能够一次定义多个函数：
+
+```javascript
+(function( $ ){
+    $.extend($.fn, {
+        myplugin: function(){
+            // your plugin logic
+        }
+    });
+})( jQuery );
+```
+
+## 最新的模块化 JavaScript 设计模式
+
+模块化Javascript的几种形式：
+
+- AMD
+- CMD
+- CommonJS
+- Harmony
+
+### 第一章：ES Harmony 特性
+
+**注意**：尽管Harmony仍然处于建设性阶段，我们也已经可以尝试ES.next的（部分）特性了，而这得感谢Google的Traceur编译器为模块化的Javascript提供的原生支持。
+
+- mport声明绑定了一个以本地变量身份导出的模块，而且可能被重命名以避免名称重复或冲突。
+- export声明声明了模块本地绑定的外部可见性，那样其他模块就可能读取到导出但不能修改它们。有趣的是，模块可能导出子模块但不能够导出已经在另外一个地方定义的模块。我们也可以对导出进行重命名以便它们的外部名称同本地名称有所不同。
+
+```javascript
+module staff{
+    // specify (public) exports that can be consumed by
+    // other modules
+    export var baker = {
+        bake: function( item ){
+            console.log( "Woo! I just baked " + item );
+        }
+    }  
+}
+
+module skills{
+    export var specialty = "baking";
+    export var experience = "5 years";
+}
+
+module cakeFactory{
+    // specify dependencies
+    import baker from staff;
+    // import everything with wildcards
+    import * from skills;
+    export var oven = {
+        makeCupcake: function( toppings ){
+            baker.bake( "cupcake", toppings );
+        },
+        makeMuffin: function( mSize ){
+            baker.bake( "muffin", size );
+        }
+    }
+}
+```
+
+#### 模块加载API
+
+被提出来的模块加载器描述了一个用于在一个被高度控制的环境中加载模块的动态API。加载器上支持的签名包含load(url, moduleInstance, error)用于加载模块，createModule(object, globalModuleReferences)以及其他的操作。
+
+```javascript
+Loader.load( "http://addyosmani.com/factory/cakes.js" ,
+    function( cakeFactory ){
+        cakeFactory.oven.makeCupcake( "chocolate" );
+    });
+```
+
+#### 针对服务器的CommonJS类似模块
+
+对于那些对服务器环境更加感兴趣的开发者，ES.next提供的模块系统并不仅仅限制只在浏览器中寻找模块。例如在下面，我们能够看到一个CommonJS类似的模块被提供给在服务器上使用。
+
+```javascript
+// io/File.js
+export function open( path ) { ... };
+export function close( hnd ) { ... };
+// compiler/LexicalHandler.js
+module file from "io/File";
+
+import { open, close } from file;
+export function scan( in ) {
+    try {
+        var h = open( in ) ...
+    }
+    finally { close( h ) }
+}
+
+module lexer from "compiler/LexicalHandler";
+module stdlib from "@std";
+```
+
+### 第二章：AMD 异步模块定义
+
+AMD (异步模块定义Asynchronous Module Definition)格式的最终目的是提供一个当前开发者能使用的模块化Javascript方案。
+
+AMD模块格式本身是模块定义的一个建议，通过它模块本身和模块之间的引用可以被异步的加载。它有几个明显的优点，包括异步的调用和本身的高扩展性，它实现了解耦，模块在代码中也可通过识别号进行查找。
+
+关于AMD值得特别注意的两个概念就是：
+
+- 一个帮助定义模块的define方法和一个处理依赖加载的require方法；
+- define被用来通过下面的方式定义命名的或者未命名的模块；
+
+```javascript
+define(
+    module_id /*可选的*/,
+    [dependencies] /*可选的*/,
+    definition function /*用来实例化模块或者对象的方法*/
+);
+```
+
+动态加载依赖：
+
+```javascript
+define(function ( require ) {
+    var isReady = false, foobar;
+    // note the inline require within our module definition
+    require(["foo", "bar"], function ( foo, bar ) {
+        isReady = true;
+        foobar = foo() + bar();
+    });
+    // we can still return a module
+    return {
+        isReady: isReady,
+        foobar: foobar
+    };
+});
+```
+
+理解 AMD 插件：
+
+```javascript
+define( ["./templates", "text!./template.md","css!./template.css" ],
+    function( templates, template ){
+        console.log( templates );
+        // do something with our templates here
+    }
+});
+```
+
+使用 RequireJS 加载 AMD 模块：
+
+```javascript
+require(["app/myModule"],
+    function( myModule ){
+        // start the main module which in-turn
+        // loads other modules
+        var module = new myModule();
+        module.doStuff();
+});
+```
+
+延迟依赖模块：
+
+```javascript
+define(["lib/Deferred"], function( Deferred ){
+    var defer = new Deferred();
+    require(["lib/templates/?index.html","lib/data/?stats"],
+        function( template, data ){
+            defer.resolve( { template: template, data:data } );
+        }
+    );
+    return defer.promise();
+});
+```
+
+AMD 模块化优点：
+
+- 提供了一个清晰的方案，告诉我们如何定义一个可扩展的模块；
+- 和我们常用的前面的全局命名空间以及 `<script>` 标签解决方案相比较，非常清晰。有一个清晰的方式用于声明独立的模块，以及它们所依赖的模块；
+- 模块定义被封装了，有助于我们避免污染全局命名空间；
+- 比其它替代方案能更好的工作（例如CommonJS，后面我们就会看到）。没有跨域问题，局部以及调试问题，不依赖于服务器端工具。大多数AMD加载器支持在浏览器中加载模块，而不需要构建过程；
+- 提供一个“透明”的方法用于在单个文件中包含多个模块。其它方式像 CommonJS 要求必须遵循一个传输格式。 再有需要的时候，可以惰性加载脚本；
+
+### 第三章：CommonJS 声明模块服务器端的 API
+
+从架构的角度来看,CommonJS模块是一个可以复用的Javascript块，它出口对任何独立代码都起作用的特定对象。不同于AMD，通常没有针对此模块的功能封装（因此打个比方我们并没有在这里找到定义的相关语句）。
+
+CommonJS模块基本上包括两个基础的部分：一个取名为exports的自由变量，它包含模块希望提供给其他模块的对象，以及模块所需要的可以用来引入和导出其它模块的函数。
+
+理解CommonJS：require() 和 exports
+
+```javascript
+// package/lib is a dependency we require
+var lib = require( "package/lib" );
+
+// behaviour for our module
+function foo(){
+    lib.log( "hello world!" );
+}
+
+// export (expose) foo to other modules
+exports.foo = foo;
+```
 
 
 
