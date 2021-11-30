@@ -1481,7 +1481,56 @@ jQuery是目前最流行的JavaScript DOM操作库，它提供了一个在安全
 
 ### 第一章：JavaScript 组合模式
 
+组合模式 描述了一组对象可像单个对象一样的对待。这允许我们能统一的处理单个对象或多个对象。这意味着无论是一个对象还是一千个对象我们都能以同样的行为来处理。
 
+在Jquery中，当我们在一个节点或多个节点上应用方法时，我们都能以相同的方式来选择并返回JQuery对象。
+
+下面这个演示我们将使用Jquery的选择器。对单一元素(比如拥有唯一ID的元素)或拥有相同标签或Class的一组元素添加名为active的class,对待它们使用上并无不同：
+
+```javascript
+// 单一节点
+$( "#singleItem" ).addClass( "active" );
+$( "#container" ).addClass( "active" );
+
+// 一组节点
+$( "div" ).addClass( "active" );
+$( ".item" ).addClass( "active" );
+$( "input" ).addClass( "active" );
+```
+
+JQuery的addClass()实现中直接使用原生的for循环、Jquery的JQuery.each()、Jquery.fn.each来迭代一个集合以达到能同时处理一个或一组元素的目的。请看下面的例子：
+
+```javascript
+addClass: function( value ) {
+  var classNames, i, l, elem,
+    setClass, c, cl;
+  if ( jQuery.isFunction( value ) ) {
+    return this.each(function( j ) {
+      jQuery( this ).addClass( value.call(this, j, this.className) );
+    });
+  }
+  if ( value && typeof value === "string" ) {
+    classNames = value.split( rspace );
+    for ( i = 0, l = this.length; i < l; i++ ) {
+      elem = this[ i ];
+      if ( elem.nodeType === 1 ) {
+        if ( !elem.className && classNames.length === 1 ) {
+          elem.className = value;
+        } else {
+          setClass = " " + elem.className + " ";
+          for ( c = 0, cl = classNames.length; c < cl; c++ ) {
+            if ( !~setClass.indexOf( " " + classNames[ c ] + " " ) ) {
+              setClass += classNames[ c ] + " ";
+            }
+          }
+          elem.className = jQuery.trim( setClass );
+        }
+      }
+    }
+  }
+  return this;
+}
+```
 
 
 
