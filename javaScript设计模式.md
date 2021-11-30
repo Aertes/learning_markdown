@@ -1532,6 +1532,8 @@ addClass: function( value ) {
 }
 ```
 
+### 第二章：JavaScript 适配器模式
+
 
 
 
