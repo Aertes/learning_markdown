@@ -1970,7 +1970,63 @@ bindReady: function() {
 },
 ```
 
-### 第六章：代理模式
+### 第六章：JavaScript 代理模式
+
+在我们需要在一个对象后多次进行访问控制访问和上下文，代理模式是非常有用处的。
+
+当实例化一个对象开销很大的时候，它可以帮助我们控制成本，提供更高级的方式去关联和修改对象，就是在上下文中运行一个特别的方法。
+
+在jQuery核心中，一个jQUery.proxy()方法在接受一个函数的输入和返回一个一直具有特殊上下文的新的实体时存在。这确保了它在函数中的值时我们所期待的的值。
+
+一个使用该模式的例子，在点击事件操作时我们利用了定时器。设想我用下面的操作优先于任何添加的定时器：
+
+```javascript
+$( "button" ).on( "click", function () {
+  // 在这个函数中，'this'代表了被当前被点击的那个元素对象
+  $( this ).addClass( "active" );
+});
+```
+
+jQuery代理方法的实现如下：
+
+```javascript
+// Bind a function to a context, optionally partially applying any
+ // arguments.
+ proxy: function( fn, context ) {
+   if ( typeof context === "string" ) {
+     var tmp = fn[ context ];
+     context = fn;
+     fn = tmp;
+   }
+
+   // Quick check to determine if target is callable, in the spec
+   // this throws a TypeError, but we will just return undefined.
+   if ( !jQuery.isFunction( fn ) ) {
+     return undefined;
+   }
+
+   // Simulated bind
+   var args = slice.call( arguments, 2 ),
+     proxy = function() {
+       return fn.apply( context, args.concat( slice.call( arguments ) ) );
+     };
+
+   // Set the guid of unique handler to the same of original handler, so it can be removed
+   proxy.guid = fn.guid = fn.guid || proxy.guid || jQuery.guid++;
+
+   return proxy;
+ }
+```
+
+### 第七章：JavaScript 建造者模式
+
+
+
+
+
+
+
+
 
 
 
