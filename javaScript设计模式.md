@@ -1905,9 +1905,72 @@ each: function( object, callback, args ) {
 
 ### 第五章：JavaScript 惰性初始模式
 
+延迟初始化 是一种允许我们延迟初始化消耗资源比较大的进程，直到需要他们的时候（才初始化）。这其中的一个例子就是jQuery的.ready()方法，它在DOM节点加载完毕之后会执行一个回调方法。
 
+```javascript
+$( document ).ready( function () {
+    //ajax请求不会执行，直到DOM加载完成
+    var jqxhr = $.ajax({
+      url: "http://domain.com/api/",
+      data: "display=latest&order=ascending"
+    })
+    .done( function( data ) ){
+        $(".status").html( "content loaded" );
+        console.log( "Data output:" + data );
+    });
+});
+```
 
+jQuery.fn.ready()底层是通过byjQuery.bindReady()来实现的, 如下所示：
 
+```javascript
+bindReady: function() {
+  if ( readyList ) {
+    return;
+  }
+
+  readyList = jQuery.Callbacks( "once memory" );
+
+  // Catch cases where $(document).ready() is called after the
+  // browser event has already occurred.
+  if ( document.readyState === "complete" ) {
+    // Handle it asynchronously to allow scripts the opportunity to delay ready
+    return setTimeout( jQuery.ready, 1 );
+  }
+
+  // Mozilla, Opera and webkit support this event
+  if ( document.addEventListener ) {
+    // Use the handy event callback
+    document.addEventListener( "DOMContentLoaded", DOMContentLoaded, false );
+
+    // A fallback to window.onload, that will always work
+    window.addEventListener( "load", jQuery.ready, false );
+
+  // If IE event model is used
+  } else if ( document.attachEvent ) {
+    // ensure firing before onload,
+    // maybe late but safe also for iframes
+    document.attachEvent( "onreadystatechange", DOMContentLoaded );
+
+    // A fallback to window.onload, that will always work
+    window.attachEvent( "onload", jQuery.ready );
+
+    // If IE and not a frame
+    // continually check to see if the document is ready
+    var toplevel = false;
+
+    try {
+      toplevel = window.frameElement == null;
+    } catch(e) {}
+
+    if ( document.documentElement.doScroll && toplevel ) {
+      doScrollCheck();
+    }
+  }
+},
+```
+
+### 第六章：代理模式
 
 
 
