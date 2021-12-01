@@ -11,4 +11,12 @@
 3. javascript设计模式：
 
    [javascript设计模式](https://github.com/Aertes/learning_markdown/blob/main/javaScript%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F.md)
+   
+3. javascript中的for和forEach:
+
+   [javascript中的for和forEach](https://github.com/Aertes/learning_markdown/blob/main/javascript%E4%B8%AD%E7%9A%84for%E5%92%8CforEach.md)
+   
+5. javascript中的Class类：
+
+   [javascript中的Class类]()
 
