@@ -22,5 +22,5 @@
    
 5. javascript十大排序策略：
 
-   [javascript十大排序策略]()
+   [javascript十大排序策略](https://github.com/Aertes/learning_markdown/commit/3ff440383b6fa229068bb2b62073d6528afd48f0)
 
