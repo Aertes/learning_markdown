@@ -19,4 +19,8 @@
 5. javascript中的Class类：
 
    [javascript中的Class类](https://github.com/Aertes/learning_markdown/blob/main/javascript中的Class类.md)
+   
+5. javascript十大排序策略：
+
+   [javascript十大排序策略]()
 
