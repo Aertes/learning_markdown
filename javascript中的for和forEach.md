@@ -12,8 +12,6 @@
      2. 迭代：迭代是递归的一种特殊形式，是迭代器提供的一种方法，默认情况下是按照一定顺序**逐个**访问数据结构成员。迭代也是一种遍历行为；
      3. 可迭代对象：ES6 中引入了 iterable 类型，Array，Set，Map，String，arguments，NodeList，都属于 iterable，他们特点就是都拥有 [ Symbol.iterator ] 方法，包含他的对象被认为是可迭代的 iterable；
 
-![image-20211122103304456](../../sare/Library/Application%20Support/typora-user-images/image-20211122103304456.png)
-
 在了解这些后就知道 `forEach` 其实是一个迭代器，他与 `for` 循环本质上的区别是 `forEach` 是负责遍历（`Array` `Set` `Map`）可迭代对象的，而 `for` 循环是一种循环机制，只是能通过它遍历出数组。再来聊聊究竟什么是**迭代器**，还记得之前提到的 Generator 生成器，当它被调用时就会生成一个迭代器对象（Iterator Object），它有一个 `.next()`方法，每次调用返回一个对象`{value:value,done:Boolean}`，`value`返回的是 `yield` 后的返回值，当 `yield` 结束，`done`变为 `true`，通过不断调用并依次的迭代访问内部的值。**迭代器**是一种特殊对象。ES6规范中它的标志是返回对象的 `next()` 方法，迭代行为判断在 `done` 之中。在不暴露内部表示的情况下，迭代器实现了遍历。
 
 ```javascript

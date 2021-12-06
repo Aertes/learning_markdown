@@ -39,7 +39,7 @@
 
    创建一个新对象，这个对象有着原始对象属性值的一份精确拷贝。如果属性是基本类型，拷贝的就是基本类型的值，如果属性是引用类型，拷贝的就是内存地址 ，所以如果其中一个对象改变了这个地址，就会影响到另一个对象。
 
-   ![图片](https://mmbiz.qpic.cn/mmbiz_png/bwG40XYiaOKlnFeZNSaQuudozsldDtgh3IBSxNXmibERhspdia9z88MsY1XEBxImzvjribwnEJs3GjjnqdlqRn9NEg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+   ![图片](images/%E6%B5%85%E6%8B%B7%E8%B4%9D.png)
 
    上图中，`SourceObject` 是原对象，其中包含基本类型属性 `field1` 和引用类型属性 `refObj`。浅拷贝之后基本类型数据 `field2` 和 `filed1` 是不同属性，互不影响。但引用类型 `refObj` 仍然是同一个，改变之后会对另一个对象产生影响。
 
@@ -147,7 +147,7 @@
 
    深拷贝会拷贝所有的属性，并拷贝属性指向的动态分配的内存。当对象和它所引用的对象一起拷贝时即发生深拷贝。深拷贝相比于浅拷贝速度较慢并且花销较大。拷贝前后两个对象互不影响。
 
-   ![图片](https://mmbiz.qpic.cn/mmbiz_png/bwG40XYiaOKlnFeZNSaQuudozsldDtgh3BoDZs3pg1wwIzgbDexwb7BU7gRkWmpibib33yEhKS3xAic2kNnE2jRIGQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+   ![图片](images/%E6%B7%B1%E6%8B%B7%E8%B4%9D.png)
 
 2. 深拷贝的应用场景：
 
