@@ -220,7 +220,25 @@ function memoize(fn){
       }
     }
   }
+  // 另一种写法
+  function curry (fn){
+    return function curriedFn (...args){
+      if(args.length < fn.length){
+        return function (){
+          return curriedFn(...args.concat(Array.from(arguments)));
+        }
+      }
+      return fn(...args);
+    }
+  }
   ```
 
-  
+- 柯里化总结：
+
+  1. 柯里化可以让我们给一个函数传递较少的参数，得到一个已经记住了某些固定参数的新函数；
+  2. 这是一种对函数参数的‘缓存’；
+  3. 让函数变的更灵活，让函数的粒度更小；
+  4. 可以把多元函数转换成一元函数，可以组合使用函数产生强大的功能；
+
+### 第五章：函数组合
 
