@@ -173,7 +173,54 @@ function memoize(fn){
 ```
 
 - 可测试：纯函数让测试更方便；
+
 - 并行处理：
+
   1. 在多线程环境下，并行操作共享的内存数据很可能会出现意外情况；
   2. 纯函数不需要访问共享的内存数据，所以在并行环境下可以任意运行纯函数（web worker）；
+
+- 副作用：副作用让一个函数变的不纯，纯函数的根据相同的输入返回相同的输出，如果函数依赖外部的状态就无法保证输出相同，就会带来副作用；
+
+- 副作用来源：
+
+  1. 配置文件；
+  2. 数据库；
+  3. 获取用户的输入；
+
+  所有的外部交互都有可能带来副作用，副作用也使得方法的通用性不适合扩展和可重用性，同时副作用会给程序中带来安全隐患给程序带来不确定性，但是副作用不可能完全禁止，尽可能控制它们在可控范围内发生；
+
+  ```javascript
+  // 柯里化 演示：
+  function checkage (min){
+    return function (age){
+      return age >= min;
+    }
+  }
+  checkage(18)(20) // true;
+  // ES6
+  const checkAge = min => (age => age >= min)
+  ```
+
+- 柯里化（Currying）：
+
+  1. 当一个函数有多个参数的时候，先传递一部分参数调用它（这部分参数以后永远不变）；
+  2. 然后返回一个新的函数接收剩余的参数，返回结果；
+
+  高级柯里化的实现：
+
+  ```javascript
+  function curry(func) {
+    return function curried(...args) {
+      if (args.length >= func.length) {
+        return func.apply(this, args);
+      } else {
+        return function(...args2) {
+          return curried.apply(this, args.concat(args2));
+        }
+      }
+    }
+  }
+  ```
+
+  
 
