@@ -140,6 +140,20 @@
    ```
 
    可以看出，改变 `a[1]` 之后 `b[0]` 的值并没有发生变化，但改变 `a[2][0]` 之后，相应的 `b[1][0]` 的值也发生变化。说明 `slice()` 方法是浅拷贝，相应的还有`concat`等，在工作中面对复杂数组结构要额外注意。
+   
+2. 代码实现：
+
+   ```javascript
+   function cloneShallow(source) {
+       var target = {};
+       for (var key in source) {
+           if (Object.prototype.hasOwnProperty.call(source, key)) {
+               target[key] = source[key];
+           }
+       }
+       return target;
+   }
+   ```
 
 ### 三、深拷贝（Deep Copy）：
 
@@ -271,6 +285,53 @@
    ```
 
    除了上面介绍的深拷贝方法，常用的还有`jQuery.extend()` 和 `lodash.cloneDeep()`
+   
+2. 代码实现：
+
+   ```javascript
+   // 破解递归爆栈
+   function cloneDeep(x) {
+       const root = {};
+       // 栈
+       const loopList = [
+           {
+               parent: root,
+               key: undefined,
+               data: x,
+           }
+       ];
+   
+       while(loopList.length) {
+           // 深度优先
+           const node = loopList.pop();
+           const parent = node.parent;
+           const key = node.key;
+           const data = node.data;
+   
+           // 初始化赋值目标，key为undefined则拷贝到父元素，否则拷贝到子元素
+           let res = parent;
+           if (typeof key !== 'undefined') {
+               res = parent[key] = {};
+           }
+   
+           for(let k in data) {
+               if (data.hasOwnProperty(k)) {
+                   if (typeof data[k] === 'object') {
+                       // 下一次循环
+                       loopList.push({
+                           parent: res,
+                           key: k,
+                           data: data[k],
+                       });
+                   } else {
+                       res[k] = data[k];
+                   }
+               }
+           }
+       }
+       return root;
+   }
+   ```
 
 ### 四、总结：
 
