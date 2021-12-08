@@ -530,11 +530,36 @@ function memoize(fn){
      Container.of(2).map(x => x + 5); // 7
      ```
 
+  7. Monad 函子：
 
+     - Monad 函子是可以**变扁**的 Pointed 函子；IO(IO(x))
+     - 一个函子如果具有 join 和 of 两个方法，并遵守一些规律就是一个 Monad；
 
+     ```javascript
+     const fp = require('lodash/fp');
+     // IO Monad
+     class IO {
+       static of (x) {
+         return new IO(function (){
+           return x;
+         })
+       }
+       constructor(fn){
+         this._value = fn;
+       }
+       map(fn){
+         return new IO(fp.flowRight(fn, this._value));
+       }
+       join () {
+         return this._value();
+       }
+       flatMap (fn){
+         return this.map(fn).join();
+       }
+     }
+     ```
 
-
-
+     
 
 
 
