@@ -459,9 +459,107 @@ function memoize(fn){
          return new IO(fp.flowRight(fn, this._value));
        }
      }
+     
+     // 调用
+     let r = IO.of(process).map(p => p.execPath);
+     console.log(r); // IO {_value: [Function]}
+     console.log(r._value()); // 输出 node 环境执行的路径
+     ```
+
+  5. Task 异步执行：
+
+     - 异步任务的实现过于复杂，我们使用 folktale 中的 Task 来演示；
+     - folktale 一个标准的函数式编程库；
+       - 和lodash、ramda 不同的是，它没有提供很多功能函数；
+       - 只提供了一些函数式处理操作，例如：compose（组合）、curry（柯里化）等，一些函子 Task、Either、MayBe 等；
+
+     ```javascript
+     const { compose, curry } = require('folktale/core/lambda');
+     const { toUpper, first } = require('lodash/fp');
+     // 第一个参数是传入函数的参数个数
+     let f = curry(2, function (x, y) {
+       console.log(x + y);
+     })
+     f(3, 4);  // 7
+     f(3)(4);  // 7
+     
+     // 函数组合
+     let t = compose(toUpper, first);
+     t(['one', 'two']);  // ONE
+     
+     // Task 处理异步任务
+     const fs = require('fs');
+     const { task } = require('folktale/concurrency/task');
+     const { split, find } = require('lodash/fp');
+     function readFile (filename){
+       return task(resolver => {
+         fs.readFile(filename, 'utf-8', (error, data) => {
+           if(error) resolver.reject(error);
+           resolver.resolver(data);
+         })
+       })
+     }
+     // 调用；
+     readFile('package.json')
+       .map(split('\n'))
+     	.map(find(x => x.inclundes('version')))
+       .run()
+       .listen({
+         onRejected: err => {
+           console.log(err);
+         },
+         onResolved: value => {
+           console.log(value); // 'version: 1.0.0';
+         }
+     })
+     ```
+
+  6. Pointed 函子：
+
+     - Pointed 函子是实现了 of 静态方法的函子；
+     - of 方法是为了避免使用 new 来创建对象，更深层的含义是 of 方法用来把值放到上下文 Context 中（把值放到容器中，使用 map 来处理内部的值）；
+
+     ```javascript
+     class Container {
+       static of (value){
+         return new Container(value);
+       }
+       // .....
+     }
+     Container.of(2).map(x => x + 5); // 7
      ```
 
      
 
-  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
