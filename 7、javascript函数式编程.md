@@ -522,14 +522,13 @@ function memoize(fn){
      ```javascript
      class Container {
        static of (value){
+         // 上下文
          return new Container(value);
        }
        // .....
      }
      Container.of(2).map(x => x + 5); // 7
      ```
-
-     
 
 
 
