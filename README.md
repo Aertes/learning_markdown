@@ -23,4 +23,12 @@
 5. javascript十大排序策略：
 
    [javascript十大排序策略](https://github.com/Aertes/learning_markdown/commit/3ff440383b6fa229068bb2b62073d6528afd48f0)
+   
+5. javascript函数式编程：
+
+   [javascript函数式编程]()
+   
+5. javascript深浅拷贝：
+
+   [javascript深浅拷贝]()
 

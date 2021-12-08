@@ -242,3 +242,226 @@ function memoize(fn){
 
 ### 第五章：函数组合
 
+- 纯函数和柯里化很容易写出洋葱代码（嵌套代码）
+
+- 函数组合可以让我们把细粒度的函数重新组合生成一个新的函数；
+
+- 管道：
+
+- 函数组合（compose）：如果一个函数要经过多个函数处理才能得到最终值，这个时候可以把中间过程的函数合并成一个函数；
+
+  1. 函数就像是数据的管道，函数组合就是把这些管道连接起来，让数据穿过多个管道形成最终结果；
+  2. **函数组合默认是从右到左执行**；
+
+  ```javascript
+  // 函数组合演示
+  function compose (f, g){
+    return function (value){
+      return f(g(value))
+    }
+  }
+  // lodash 中的组合函数
+  const _ = require('lodash');
+  const reverse = arr => arr.reverse();
+  const first = arr => arr[0];
+  const toUpper = str => str.toUpperCase();
+  // 组合函数的参数是函数，执行时从右至左
+  const f = _.flowRight(toUpper, first, reverse);
+  console.log(f(['one', 'two', 'three'])) // THREE;
+  
+  // 模拟 lodash 中的 flowRight
+  function _flowRight (...args){
+    return function (value) {
+      return args.reverse().reduce(function (acc, fn) {
+        return fn(acc);
+      }, value)
+    }
+  }
+  // ES6 箭头函数写法
+  const __flowRight = (...args) => value => args.reverse().reduce((acc, fn) => fn(acc), value);
+  // 测试
+  const f = _.flowRight(toUpper, first, reverse);
+  console.log(f(['one', 'two', 'three'])) // THREE;
+  ```
+
+- 函数组合的特点：函数组合要满足**结合律（associativity）**：
+
+  ```javascript
+  // lodash 中的组合函数 满足结合律
+  const _ = require('lodash');
+  const f = _.flowRight(_.toUpper, _.first, _.reverse);
+  // 结合律
+  const f = _.flowRight(_.flowRight(_.toUpper, _.first), _.reverse);
+  // 结果一致
+  console.log(f(['one', 'two', 'three'])) // THREE;
+  ```
+
+- PointFree：我们可以把数据处理的过程定义成与数据无关的合成运算，不需要用到代表数据的那个参数，只要把简单的运算步骤合成到一起，在使用这种模式之前，我们需要定义一些辅助的基本运算函数；
+
+  1. 不需要指明处理的数据；
+
+  2. **只需要合成运算过程**；
+
+  3. 需要定义一些辅助的基本运算函数；
+
+  4. 案例演示：
+
+     ```javascript
+     // 非 Point Free
+     // Hello World  =>  hell_world
+     function f (word){
+       return word.toLowerCase().replace(/\s+/g, '_');
+     }
+     
+     // Point Free
+     const fp = require('lodash/fp');
+     const f = fp.flowRight(fp.replace(/\s+/g, '_'), fp.toLower);
+     console.log(f('Hello World')) // hell_world
+     ```
+
+### 第六章：函子
+
+- 函子（Functor）：
+
+  1. 容器：包含值和值的变形关系（这个变形关系就是函数）；
+  2. 函子：是一个特殊的容器，通过一个普通的对象来实现，该对象具有 map 方法，map 方法可以运行一个函数对值进行处理（变形关系）；
+
+  ```javascript
+  class Container{
+    constructor(value){
+      this._value = value;
+    };
+    map (fn) {
+      return new Container(fn(this._value));
+    }
+  }
+  let r = new Container(5).map(x => x + 1 ).map(x => x * x);
+  console.log(r) // Container {_value: 36}
+  
+  // 函子对象 隐藏new关键字
+  class _Container{
+    static of (value){
+      return new Container(value);
+    }
+    // 存储一个值，不对外共享，公布；
+    constructor(value){
+      this._value = value;
+    };
+    map (fn) {
+      return Container.of(fn(this._value));
+    }
+  }
+  let t = _Container(5).map(x => x + 2 ).map(x => x * x);
+  // t 是函子对象；
+  console.log(t) // Container {_value: 49}
+  ```
+
+  3. 总结：
+     - 函数式编程的运算不直接操作值，而是由函子完成；
+     - 函子就是一个实现了 map 契约的对象；
+     - 我们可以把函子想象成一个盒子，这个盒子里面封装了一个值；
+     - 想要处理盒子中的值，我们需要给盒子的 map 方法传递一个处理值的函数（纯函数），由这个函数来对值进行处理；
+     - 实现链式调用；
+     - 最终 map 方法返回一个包含新值的盒子（函子）；
+  4. MayBe 函子：
+
+  - 我们在编程的过程中可能会遇到很多错误，需要对这些错误做相应的处理；
+
+  - MayBe 函子的作用就是可以对外部的空值情况做处理（控制副作用在允许的范围）
+
+    ```javascript
+    // MayBe 函子
+    class MayBe {
+      static of (value) {
+        return new MayBe(value)
+      }
+      constructor(value){
+        this._value = value;
+      }
+      map (fn) {
+        return this.isNothing()? MayBe.of(null) : MayBe.of(fn(this._value));
+      }
+      isNothing () {
+        return this._value === null || this_value === undefind;
+      }
+    }
+    
+    let r = MayBe.of('Hello World').map(x => x.toUpperCase());
+    console.log(r); // MayBe {_value: 'HELLO WORLD'}
+    
+    let t = MayBe.of(null).map(x => x.toUpperCase());
+    console.log(t); // MayBe {_value: null}
+    ```
+
+  3. Either 函子：
+
+     - Either 两者中的任何一个，类似于 if...else... 的处理；
+     - 异常会让函数变的不纯，Either 函子可以用来做异常处理；
+
+     ```javascript
+     // Either 函子
+     class Left {
+       static of (value){
+         return new Left(value);
+       }
+       constructor(value){
+         this._value = value;
+       }
+       map (fn){
+         return this;
+       }
+     }
+     
+     class Right {
+       static of (value){
+         return new Right(value);
+       }
+       constructor(value){
+         this._value = value
+       }
+       map (fn) {
+         return Right.of(fn(this._value));
+       }
+     }
+     
+     function parseJSON (str){
+       try{
+         return Right.of(JSON.parse(str))
+       }catch(e){
+         return Left.of({error: e.message})
+       }
+     }
+     
+     let r = parseJSON('{name: zs}');
+     console.log(r); // Left {_value: {error: 'Unexpected token n in JSON at position 2'}}
+     let t = parseJSON('{"name": "zs"}');
+     console.log(t); // Right {_value: {name: "zs"}}
+     ```
+
+  4. IO 函子：
+
+     - IO 函子中的 _value 是一个函数，这里是吧函数作为值来处理；
+     - IO 函数可以把不纯的动作存储到 _value 中，延迟执行这个不纯的操作（惰性执行），当前的操作是纯的，把不纯的操作包装；
+     - 把不纯的操作交给调用者来处理；
+
+     ```javascript
+     const fp = require('lodash/fp');
+     class IO {
+       static of (x) {
+         return new IO(function (){
+           return x;
+         })
+       }
+       constructor(fn){
+         this._value = fn;
+       }
+       map(fn){
+         return new IO(fp.flowRight(fn, this._value));
+       }
+     }
+     ```
+
+     
+
+  
+
