@@ -26,9 +26,9 @@
    
 5. javascript函数式编程：
 
-   [javascript函数式编程]()
+   [javascript函数式编程](https://github.com/Aertes/learning_markdown/blob/main/7%E3%80%81javascript%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B.md)
    
 5. javascript深浅拷贝：
 
-   [javascript深浅拷贝]()
+   [javascript深浅拷贝](https://github.com/Aertes/learning_markdown/blob/main/8%E3%80%81javascript%E6%B7%B1%E6%B5%85%E6%8B%B7%E8%B4%9D.md)
 
