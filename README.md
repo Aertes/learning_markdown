@@ -31,4 +31,12 @@
 5. javascript深浅拷贝：
 
    [javascript深浅拷贝](https://github.com/Aertes/learning_markdown/blob/main/8%E3%80%81javascript%E6%B7%B1%E6%B5%85%E6%8B%B7%E8%B4%9D.md)
+   
+5. javascript异步编程：
+
+   [javascript异步编程]()
+   
+10. javascript的Promise实现：
+
+   [javascript的Promise实现]()
 
