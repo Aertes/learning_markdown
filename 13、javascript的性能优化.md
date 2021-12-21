@@ -308,4 +308,34 @@ func()
 
     ![image-20211220174154675](../../../Library/Application%20Support/typora-user-images/image-20211220174154675.png)
 
-12. 
+12. 减少作用域链查找层级：
+
+    ![image-20211221100117098](../../../Library/Application%20Support/typora-user-images/image-20211221100117098.png)
+
+13. 减少数据读取次数：（引用类型的值提前缓存）
+
+    ![image-20211221102118724](../../../Library/Application%20Support/typora-user-images/image-20211221102118724.png)
+
+14. 字面量和构造式：（字面量快于构造式）
+
+    ![image-20211221102614809](../../../Library/Application%20Support/typora-user-images/image-20211221102614809.png)
+
+    ![image-20211221102831567](../../../Library/Application%20Support/typora-user-images/image-20211221102831567.png)
+
+15. 减少循环体中活动：
+
+    ![image-20211221103510452](../../../Library/Application%20Support/typora-user-images/image-20211221103510452.png)
+
+    ![image-20211221103712039](../../../Library/Application%20Support/typora-user-images/image-20211221103712039.png)
+
+16. 减少声明及最小化语句数：
+
+    ![image-20211221104212594](../../../Library/Application%20Support/typora-user-images/image-20211221104212594.png)
+
+    ![image-20211221104554566](../../../Library/Application%20Support/typora-user-images/image-20211221104554566.png)
+
+17. 采用事件绑定：（事件委托）
+
+    
+
+    
