@@ -335,7 +335,3 @@ func()
     ![image-20211221104554566](../../../Library/Application%20Support/typora-user-images/image-20211221104554566.png)
 
 17. 采用事件绑定：（事件委托）
-
-    
-
-    
