@@ -7,29 +7,23 @@
 
 ### 第二章：let 、 const 和块级作用域
 
-
-
-
-
 ### Porxy
 
-| **handler 方法**         | **触发方式**                                                 |
-| ------------------------ | ------------------------------------------------------------ |
-| get                      | 读取某个属性                                                 |
-| set                      | 写入某个属性                                                 |
-| has                      | in 操作符                                                    |
-| deleteProperty           | delete 操作符                                                |
-| getPrototypeOf           | Object.getPrototypeOf()                                      |
-| setPrototypeOf           | Object.setPrototypeOf()                                      |
-| isExtensible             | Object.isExtensible()                                        |
-| preventExtensions        | Object.preventExtensions()                                   |
-| getOwnPropertyDescriptor | Object.getOwnPropertyDescriptor()                            |
-| defineProperty           | Object.defineProperty()                                      |
+| **handler 方法**           | **触发方式**                                                         |
+| ------------------------ | ---------------------------------------------------------------- |
+| get                      | 读取某个属性                                                           |
+| set                      | 写入某个属性                                                           |
+| has                      | in 操作符                                                           |
+| deleteProperty           | delete 操作符                                                       |
+| getPrototypeOf           | Object.getPrototypeOf()                                          |
+| setPrototypeOf           | Object.setPrototypeOf()                                          |
+| isExtensible             | Object.isExtensible()                                            |
+| preventExtensions        | Object.preventExtensions()                                       |
+| getOwnPropertyDescriptor | Object.getOwnPropertyDescriptor()                                |
+| defineProperty           | Object.defineProperty()                                          |
 | ownKeys                  | Object.getOwnPropertyNames()<br />Object.getOwnPropertySymbols() |
-| apply                    | 调用一个函数                                                 |
-| construct                | 用 new 调用一个函数                                          |
-
-
+| apply                    | 调用一个函数                                                           |
+| construct                | 用 new 调用一个函数                                                     |
 
 ### Reflect 的 13种方法
 
@@ -49,17 +43,9 @@
 
 ### Map 和  Set 数据结构
 
-
-
-
-
 ### Symbol 数据结构
 
-
-
 ### Generator 生成器
-
-
 
 ### ECMAScript 2016
 
@@ -105,4 +91,3 @@ console.log(new Map(Object.entries(obj))); // Map(2) {'foo' => 'val1', 'bar' =>
 // Object.getOwnPropertyDescriptors
 console.log(Object.getOwnPropertyDescriptors(obj));
 ```
-
