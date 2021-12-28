@@ -5,20 +5,61 @@
 ### 第二章：配置文件
 
 - webpack.config.js 
-
+  
   ```javascript
   const path = require('path')
   const { CleanWebpackPlugin } = require('clean-webpack-plugin')
   const HtmlWebpackPlugin = require('html-webpack-plugin')
   const CopyWebpackPlugin = require('copy-webpack-plugin')
+  // 自实现一个 plugin
+  class MyPlugin {
+    // webpack 启动时，会自动调用
+    apply (compiler) {
+      // compiler 核心的对象参数
+      console.log('MyPlugin 启动')
+      compiler.hooks.emit.tap('MyPlugin', compilation => {
+        // compilation => 可以理解为此次打包的上下文
+        for(const filename in compilation.assets){
+          // console.log(filename) 获取文件名
+          // console.log(compilation.assets[filename].source()) // 获取文件中的内容
+          if(filename.endsWith('.js')){
+            const contents = compilation.assets[filename].source()
+            const withoutComments = contents.replace(/\/\*\*+\*\//g, '')
+            compilation.assets[filename] = {
+              source: () => withoutComments,
+              size: () => withoutComments.length
+            }
+          }
+        }
+      })
+    }
+  }
+  
   module.exports = {
     mode: 'development' // development 模式：（开发模式）\ production 模式：（生产模式）\ none 模式：（原始打包模式）
     entry: './src/main.js', // 打包的入口文件
     output： {
-    	filename: 'bundle.js', // 打包后的输出文件名
-    	path: path.join(__dirname, 'dist'), // 打包后的输出文件路径
-      // publicPath: 'dist/', // '' 表示网站的根目录， 'dist/' 表示项目的目录
-  	},
+        filename: 'bundle.js', // 打包后的输出文件名
+        path: path.join(__dirname, 'dist'), // 打包后的输出文件路径
+        // publicPath: 'dist/', // '' 表示网站的根目录， 'dist/' 表示项目的目录
+      },
+    devtool: 'source-map',
+    devServer: {
+      // 为 webpack-dev-server 额外的为开发服务器指定查找资源目录
+      contentBase: ['./public'],
+      proxy: {
+        '/api': {
+          // http://localhost:8080/api/users => https://api.github.com/api/users
+          target: 'https://api.github.com',
+            // http://localhost:8080/api/users => https://api.github.com/users
+          pathRewrite: {
+            '^/api': ''
+          },
+           // 不能使用 localhost:8080 作为请求 github 的主机名
+          changeOrigin: true
+        },
+      }
+    },
     module: {
       rules: [
         {
@@ -62,7 +103,7 @@
       ]
     },
     plugins: [
-    	new CleanWebpackPlugin(),
+        new CleanWebpackPlugin(),
       // 用于生成 index.html
       new HtmlWebpackPlugin({
         title: 'webpack plugin sample',
@@ -75,10 +116,13 @@
       new HtmlWebpackPlugin({
         filename: 'about.html',
       }),
+      // 开发过程中不需要使用此插件，在生产过程中需要copy静态资源到生产目录
       new CopyWebpackPlugin([
         // 'public/**'
         'public'
-      ])
+      ]),
+      // 移除 生成 js 文件中的注释插件 
+      new MyPlugin()
     ]
   }
   ```
@@ -91,11 +135,10 @@
 
 ### 第四章：打包结果运行原理
 
-- 
-
-### 第五章：资源模块加载
+- ### 第五章：资源模块加载
 
 - 内部默认的 javascript 文件的 Loader 加载器；
+
 - 其他文件格式的需要 Other Loader 的加载器；
 
 ### 第六章：导入资源模块
@@ -125,9 +168,9 @@
 ![image-20211228154650624](../../../Library/Application%20Support/typora-user-images/image-20211228154650624.png)
 
 - loader 的工作原理：（示例：markdown-loader.js）
-
+  
   专注实现资源模块的加载
-
+  
   ```javascript
   const marked = require('marked')
   module.exports = source => {
@@ -140,17 +183,62 @@
     // return 'console.log("hello ~")'
   }
   ```
-
+  
   1. loader 负责资源文件从输入到输出到转换；
   2. loader 是个管道 （pie）的概念；
   3. 对同一个资源可以依次使用多个 loader；
 
 - webpack 的插件机制：（Plugin）
-
+  
   Plugin 解决项目中自动化工作
-
+  
   - 目的是增强 webpack 的项目自动化能力；
   - 例如：清除 dist 目录，拷贝静态文件至输出目录，压缩输出代码；
   - clean-webpack-plugin：自动清除输出目录的插件
   - html-webpack-plugin：自动生成使用 bundle.js 的 html；
   - copy-webpack-plugin：自动将静态资源拷贝到打包目录中；
+  
+  Plugin 通过钩子机制实现的：
+  
+  - webpack-plugin 必须是一个函数或者是一个包含 apply 方法的对象；
+  
+  - 通过在 webpack 生命周期的钩子中挂载任务函数实现扩展
+
+### 第八章：webpack 中开发体验问题
+
+1. 以 HTTP Server 运行；
+
+2. 自动编译 + 自动刷新；
+
+3. 提供 Source Map 支持；
+- 实现自动编译：
+  
+  webpack-cli 提供的 watch 工作模式：监听文件变化，自动重新打包
+
+- 实现自动刷新：
+  
+  BrowserSync 工具  //1、 操作麻烦；2、效率上降低了；3、磁盘读写操作两次
+
+- Webpack Dev Server：
+  
+  - 提供了用于开发的 HTTP Server；
+  - 集成【自动编译】和【自动刷新浏览器】；
+  - 打包结果存在内存中；减少磁盘操作；
+  - 默认会将构建结果输出的文件，全部作为开发服务（server）的资源文件；只要是 webpack 输出的文件，都可以被直接访问；其他静态资源文件也需要额外的配置 Dev Server；
+  - devServer : { contentBase: ['./public'] } 为 webpack-dev-server 额外的为开发服务器指定查找静态资源目录；
+  - 支持配置代理服务：proxy
+
+- Source Map：
+  
+  - 映射源代码与转换后代码的关系；
+  
+  - 解决了源代码与运行代码不一致所产生的调试问题；
+  
+  - webpack 配置 source map：
+    
+    - devtool: 'source-map’
+    - eval 模式下的 Source Map：
+    
+    ![image-20211228172913136](../../../Library/Application%20Support/typora-user-images/image-20211228172913136.png)
+  
+  - 

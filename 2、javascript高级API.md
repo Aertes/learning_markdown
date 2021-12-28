@@ -14,6 +14,7 @@ MutationObserver  是个构造器，接受一个 callBack 参数，用来处理�
 MutationObserver 对像有三个方法，分别如下：
 
 - observe：设置观察目标，接受两个参数，
+  
   - target：观察目标；
   - options：通过对象成员来设置观察选项（参数选项说明）；
     1. childList：设置 true ，表示观察目标子节点的变化，比如添加或删除目标子节点，不包括修改子节点以及节点后代的变化；
@@ -27,7 +28,7 @@ MutationObserver 对像有三个方法，分别如下：
 - disconnect：阻止观察者观察任何变化；
 
 - takeRecords：清空记录队列并返回里面的内容；
-
+  
   ```javascript
   //选择一个需要观察的节点
   var targetNode = document.getElementById('root')
@@ -78,9 +79,9 @@ MutationObserver 有以下特点：
 IntersectionObserver 是浏览器原生提供的构造函数，接受两个参数：
 
 - callback：是可见性变化时的回调函数；
-
+  
   callback 函数的参数（entries）是一个数组，每个成员都是一个 IntersectionObserverEntry 对象。举例来说，如果同时有两个被观察的对象的可见性发生变化，entries 数组就会有两个成员。
-
+  
   1. time：可见性发生变化的时间，是一个高精度时间戳，单位为毫秒；
   2. target：被观察的目标元素，是一个 DOM 节点对象；
   3. isIntersecting: 目标是否可见；
@@ -90,7 +91,7 @@ IntersectionObserver 是浏览器原生提供的构造函数，接受两个参�
   7. intersectionRatio：目标元素的可见比例，即 intersectionRect 占 boundingClientRect 的比例，完全可见时为 1，完全不可见时小于等于 0；
 
 - option：是配置对象（该参数可选）。
-
+  
   ```javascript
   var io = new IntersectionObserver(callback, option)
   // 开始观察
@@ -283,9 +284,9 @@ let DOMRect = object.getBoundingClientRect()
 #### 3.应用场景：
 
 1. 获取 dom 元素相对于网页左上角定位的距离：
-
+   
    以前的写法是通过 offsetParent 找到元素到定位父级元素，直至递归到顶级元素 body 或 html；
-
+   
    ```javascript
    // 获取dom元素相对于网页左上角定位的距离
    function offset(el) {
@@ -303,16 +304,16 @@ let DOMRect = object.getBoundingClientRect()
    var odiv = document.getElementsByClassName('markdown-body')
    offset(a[0]) // {top: 271, left: 136}
    ```
-
+   
    现在根据 getBoundingClientRect 这个 api，可以写成这样：
-
+   
    ```javascript
    var positionX = this.getBoundingClientRect().left + document.documentElement.scrollLeft
    var positionY = this.getBoundingClientRect().top + document.documentElement.scrollTop
    ```
 
 2. 判断元素是否在可视区域内：
-
+   
    ```javascript
    function isElView(el) {
      var top = el.getBoundingClientRect().top // 元素顶端到可见区域顶端的距离
@@ -381,19 +382,19 @@ window.requestAnimationFrame(render)
 #### 3.优点：
 
 1. CPU 节能：
-
+   
    使用 setTimeout 实现的动画，当页面被隐藏或最小化时，setTimeout 仍然在后台执行动画任务，由于此时页面处于不可见或不可用状态，刷新动画是没有意义的，完全是浪费 CPU 资源。而 requestAnimationFrame 则完全不同，当页面处理未激活的状态下，该页面的屏幕刷新任务也会被系统暂停，因此跟着系统步伐走的 requestAnimationFrame 也会停止渲染，当页面被激活时，动画就从上次停留的地方继续执行，有效节省了 CPU 开销。
 
 2. 函数节流：
-
+   
    在高频率事件(resize,scroll 等)中，为了防止在一个刷新间隔内发生多次函数执行，使用 requestAnimationFrame 可保证每个刷新间隔内，函数只被执行一次，这样既能保证流畅性，也能更好的节省函数执行的开销。一个刷新间隔内函数执行多次时没有意义的，因为显示器每 16.7ms 刷新一次，多次绘制并不会在屏幕上体现出来。
 
 #### 4.应用场景：
 
 1. 监听 scroll 函数：
-
+   
    页面滚动事件（scroll）的监听函数，就很适合用这个 api，推迟到下一次重新渲染。
-
+   
    ```javascript
    $(window).on('scroll', function () {
      window.requestAnimationFrame(scrollHandler)
@@ -411,11 +412,11 @@ window.requestAnimationFrame(render)
    ```
 
 2. 大量数据渲染：
-
+   
    比如对十万条数据进行渲染，主要由以下几种方法：
-
+   
    1. 使用定时器：
-
+   
    ```javascript
    //需要插入的容器
    let ul = document.getElementById('container')
@@ -445,9 +446,9 @@ window.requestAnimationFrame(render)
    }
    loop(total, index)
    ```
-
+   
    2. 使用 requestAnimationFrame：
-
+   
    ```javascript
    //需要插入的容器
    let ul = document.getElementById('container')

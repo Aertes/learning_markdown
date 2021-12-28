@@ -3,20 +3,20 @@
 - Promise 就是一个类，在执行这个类的时候，需要传递一个执行器进去，执行器会立即执行；
 
 - Promise 中有三种状态：
-
+  
   1. 成功（fulfilled）： pending => fulfilled
   2. 失败（rejected）：pending => rejected
   3. 等待（pending）：
-
+  
   注意：**一旦状态确定就不可更改**
-
+  
   - resolve 和  reject 函数是用来更改状态的；
     1. resolve => fulfilled；
     2. reject => rejected；
   - then 方法内部做的事情就是判断状态，如果状态是成功，就调用成功的回调函数，如果状态是失败，就调用失败的回调函数；then 方法是被定义在原型对象中的；
   - then 成功回调有一个参数，表示成功之后的值；then 失败回调有一个参数，表示失败后的原因；
   - then 方法是可以被链式调用的，后面 then 方法的回调函数拿到的值是上一个 then 方法的回调函数的返回值；
-
+  
   ```javascript
   new Promise((resolve, reject) => {
     resolve('成功')
@@ -24,7 +24,7 @@
     reject('失败')
   })
   ```
-
+  
   ```javascript
   // 实现 MyPromise
   const PENDING = 'pending'; // 等待；
@@ -34,7 +34,7 @@
     constructor(executor){
       try{
         // 表示执行器，，立即调用执行器
-      	executor(this.resolve, this.reject)
+          executor(this.resolve, this.reject)
       }catch(e){
         this.reject(e);
       }
@@ -83,7 +83,7 @@
           setTimeout(() => {
             try{
               let x =  successCallback(this.value);
-          		resolvePromise(promiseObj, x, resolve, reject);
+                  resolvePromise(promiseObj, x, resolve, reject);
             }catch(e){
               reject(e)
             }
@@ -93,7 +93,7 @@
           setTimeout(() => {
             try{
               let x =  failCallback(this.reason);
-          		resolvePromise(promiseObj, x, resolve, reject);
+                  resolvePromise(promiseObj, x, resolve, reject);
             }catch(e){
               reject(e)
             }
