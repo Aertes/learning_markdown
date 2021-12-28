@@ -4,17 +4,20 @@
 
 ### 第二章：配置文件
 
-- webpack.config.js
+- webpack.config.js 
 
   ```javascript
   const path = require('path')
+  const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+  const HtmlWebpackPlugin = require('html-webpack-plugin')
+  const CopyWebpackPlugin = require('copy-webpack-plugin')
   module.exports = {
     mode: 'development' // development 模式：（开发模式）\ production 模式：（生产模式）\ none 模式：（原始打包模式）
     entry: './src/main.js', // 打包的入口文件
     output： {
     	filename: 'bundle.js', // 打包后的输出文件名
     	path: path.join(__dirname, 'dist'), // 打包后的输出文件路径
-        publicPath: 'dist/', // '' 表示网站的根目录， 'dist/' 表示项目的目录
+      // publicPath: 'dist/', // '' 表示网站的根目录， 'dist/' 表示项目的目录
   	},
     module: {
       rules: [
@@ -58,7 +61,25 @@
         }
       ]
     },
-      
+    plugins: [
+    	new CleanWebpackPlugin(),
+      // 用于生成 index.html
+      new HtmlWebpackPlugin({
+        title: 'webpack plugin sample',
+        meta: {
+          viewport: 'width=device-width'
+        },
+        template: './src/index.html'
+      }),
+      // 用于生成 about.html
+      new HtmlWebpackPlugin({
+        filename: 'about.html',
+      }),
+      new CopyWebpackPlugin([
+        // 'public/**'
+        'public'
+      ])
+    ]
   }
   ```
 
@@ -101,14 +122,35 @@
 
 - loader 机制是 webpack 的核心；
 
+![image-20211228154650624](../../../Library/Application%20Support/typora-user-images/image-20211228154650624.png)
+
 - loader 的工作原理：（示例：markdown-loader.js）
 
+  专注实现资源模块的加载
+
   ```javascript
-  
+  const marked = require('marked')
   module.exports = source => {
-    // 通过 source 参数接收 输入， 通过返回值，去输出
-    console.log(source); // 
+    // 通过 source 参数接收 输入， 通过返回值，去输出,且返回值必须是 js 代码 或是 其他的loader （other loader）
+    // console.log(source);
+    const html = marked(source)
+    // return `module.exports = ${JSON.stringify(html)}`
+    // 支持 ES Module 方式导出
+    return `export default ${JSON.stringify(html)}`
+    // return 'console.log("hello ~")'
   }
   ```
 
-  
+  1. loader 负责资源文件从输入到输出到转换；
+  2. loader 是个管道 （pie）的概念；
+  3. 对同一个资源可以依次使用多个 loader；
+
+- webpack 的插件机制：（Plugin）
+
+  Plugin 解决项目中自动化工作
+
+  - 目的是增强 webpack 的项目自动化能力；
+  - 例如：清除 dist 目录，拷贝静态文件至输出目录，压缩输出代码；
+  - clean-webpack-plugin：自动清除输出目录的插件
+  - html-webpack-plugin：自动生成使用 bundle.js 的 html；
+  - copy-webpack-plugin：自动将静态资源拷贝到打包目录中；
