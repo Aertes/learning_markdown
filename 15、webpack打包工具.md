@@ -165,7 +165,7 @@
 
 - loader 机制是 webpack 的核心；
 
-![image-20211228154650624](../../../Library/Application%20Support/typora-user-images/image-20211228154650624.png)
+![image-20211228154650624](files/typora-user-images/image-20211228154650624.png)
 
 - loader 的工作原理：（示例：markdown-loader.js）
   
@@ -239,6 +239,7 @@
     - devtool: 'source-map’
     - eval 模式下的 Source Map：
     
-    ![image-20211228172913136](../../../Library/Application%20Support/typora-user-images/image-20211228172913136.png)
+    ![image-20211228172913136](files/typora-user-images/image-20211228172913136.png)
   
   - 
+

@@ -167,7 +167,7 @@ func()
   2. 内存分为新生代、老生代；
   3. 针对不同对象采用不同算法；
 
-  ![image-20211220142124582](../../../Library/Application%20Support/typora-user-images/image-20211220142124582.png)
+  ![image-20211220142124582](files/typora-user-images/image-20211220142124582.png)
 
 - V8 中常用 GC 算法：
 
@@ -198,7 +198,7 @@ func()
        1. 新生代（复制算法）区域垃圾回收使用空间换时间；
        2. 老生代区域垃圾回收不适合复制算法；
 
-     ![image-20211220144200649](../../../Library/Application%20Support/typora-user-images/image-20211220144200649.png)
+     ![image-20211220144200649](files/typora-user-images/image-20211220144200649.png)
 
   2. 空间复制：
 
@@ -302,36 +302,36 @@ func()
 
     - 通过字面量的方式替换 new 关键
 
-    ![image-20211220164848173](../../../Library/Application%20Support/typora-user-images/image-20211220164848173.png)
+    ![image-20211220164848173](files/typora-user-images/image-20211220164848173.png)
 
 11. 减少判断层级：
 
-    ![image-20211220174154675](../../../Library/Application%20Support/typora-user-images/image-20211220174154675.png)
+    ![image-20211220174154675](files/typora-user-images/image-20211220174154675.png)
 
 12. 减少作用域链查找层级：
 
-    ![image-20211221100117098](../../../Library/Application%20Support/typora-user-images/image-20211221100117098.png)
+    ![image-20211221100117098](files/typora-user-images/image-20211221100117098.png)
 
 13. 减少数据读取次数：（引用类型的值提前缓存）
 
-    ![image-20211221102118724](../../../Library/Application%20Support/typora-user-images/image-20211221102118724.png)
+    ![image-20211221102118724](files/typora-user-images/image-20211221102118724.png)
 
 14. 字面量和构造式：（字面量快于构造式）
 
-    ![image-20211221102614809](../../../Library/Application%20Support/typora-user-images/image-20211221102614809.png)
+    ![image-20211221102614809](files/typora-user-images/image-20211221102614809.png)
 
-    ![image-20211221102831567](../../../Library/Application%20Support/typora-user-images/image-20211221102831567.png)
+    ![image-20211221102831567](files/typora-user-images/image-20211221102831567.png)
 
 15. 减少循环体中活动：
 
-    ![image-20211221103510452](../../../Library/Application%20Support/typora-user-images/image-20211221103510452.png)
+    ![image-20211221103510452](files/typora-user-images/image-20211221103510452.png)
 
-    ![image-20211221103712039](../../../Library/Application%20Support/typora-user-images/image-20211221103712039.png)
+    ![image-20211221103712039](files/typora-user-images/image-20211221103712039.png)
 
 16. 减少声明及最小化语句数：
 
-    ![image-20211221104212594](../../../Library/Application%20Support/typora-user-images/image-20211221104212594.png)
+    ![image-20211221104212594](files/typora-user-images/image-20211221104212594.png)
 
-    ![image-20211221104554566](../../../Library/Application%20Support/typora-user-images/image-20211221104554566.png)
+    ![image-20211221104554566](files/typora-user-images/image-20211221104554566.png)
 
 17. 采用事件绑定：（事件委托）
