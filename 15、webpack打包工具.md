@@ -8,6 +8,7 @@
   
   ```javascript
   const path = require('path')
+  const webpack = require('webpack')
   const { CleanWebpackPlugin } = require('clean-webpack-plugin')
   const HtmlWebpackPlugin = require('html-webpack-plugin')
   const CopyWebpackPlugin = require('copy-webpack-plugin')
@@ -43,8 +44,19 @@
         path: path.join(__dirname, 'dist'), // 打包后的输出文件路径
         // publicPath: 'dist/', // '' 表示网站的根目录， 'dist/' 表示项目的目录
       },
-    devtool: 'source-map',
+     // 集中配置 webpack 内部优化功能 => Tree-shaking 的实现
+    optimization: {
+      usedExports: true, // 只导出外部使用的成员
+      minimize: true, // 开启代码压缩功能
+      concatenateModules: true, // 尽可能的将所有模块合并输出到一个函数中
+      sideEffects: true, // 模块副作用  package.json 中添加 sideEffects:false
+    }
+    devtool: 'cheep-module-eavl-source-map',
     devServer: {
+      // 开启 HMR 
+      // hot: true, 
+      // 热更新出现错误不会自动刷新页面
+      hotOnly: true, 
       // 为 webpack-dev-server 额外的为开发服务器指定查找资源目录
       contentBase: ['./public'],
       proxy: {
@@ -122,7 +134,9 @@
         'public'
       ]),
       // 移除 生成 js 文件中的注释插件 
-      new MyPlugin()
+      new MyPlugin(),
+      // 热更新插件
+      new webpack.HotModuleReplacementPlugin()
     ]
   }
   ```
@@ -217,7 +231,7 @@
 
 - 实现自动刷新：
   
-  BrowserSync 工具  //1、 操作麻烦；2、效率上降低了；3、磁盘读写操作两次
+  BrowserSync 工具  //1、 操作麻烦；2、效率上降低了；3、磁盘读写操作两次；
 
 - Webpack Dev Server：
   
@@ -241,5 +255,72 @@
     
     ![image-20211228172913136](files/typora-user-images/image-20211228172913136.png)
   
-  - 
+  - 开发环境适合用 cheep-module-eavl-source-map 模式；
+  
+  - 生产环境适合用 none 模式 / nosource-source-map 模式；
+  
+- HMR（Hot Module Replacement）模块热更新：解决页面自动刷新导致页面状态丢失的问题；
 
+  ```shell
+  webpack-dev-server  --hot
+  ```
+
+  - webpack 中的 HMR 需要手动处理模块热替换逻辑；
+
+  - HMR API 的核心对象：(module.hot)
+
+    ```javascript
+    module.hot.accept('./editor', () => {
+      console.log('edit 模块更新了，需要手动处理热替换逻辑')
+    })
+    ```
+
+### 第九章：生产环境优化
+
+生产环境注重运行效率；开发环境注重开发效率；webpack 4.0+ 推出 mode 模式用法
+
+1. 配置文件根据环境的不同导出不同配置；（中小型项目）
+2. 一个环境对应一个配置文件；（大型项目）
+
+- DefinePlugin 默认插件配置
+
+  - 为代码注入全局成员
+
+  ```javascript
+  process.env.NODE_ENV
+  ```
+
+- Tree-shaking：删除代码中未引用的部分；未引用代码（dead-code）
+
+  - tree-shaking 不是指某个配置选项
+
+  - 一组功能搭配使用后的优化效果
+
+  - 在 production（生产）模式下自动启用
+
+    - usedExports 负责标记未被引用的代码；
+    - minimize 负责移除这些被标记的代码；
+    - concatenateModules 尽可能的将所有模块合并输出到一个函数中，即提升了运行效率，又减少了代码的体积（Scope Hoisting）；
+
+  - sideEffects：
+
+    副作用：模块执行时除了导出成员之外所作的事情；
+
+    sideEffects 一般用于 npm 包标记是否有副作用；
+
+    - 确定代码中真的没有副作用
+
+- Code Splitting：代码分包 / 代码分割
+
+  - 多入口打包：多个入口打包输出多个打包结果；
+    - Multi Entry：一般适用于传统的多页应用程序
+    - 一个页面对应一个打包入口；
+    - 公共部分单独提取；
+      - Split Chunks：
+  - 动态导入：实现模块的按需加载；
+    - 动态导入的模块会被自动分包；
+  - MiniCssExtractPlugin：提取 CSS 到单个文件；
+  - OptimizeCssAssetsWebpackPlugin：压缩输出的 CSS 文件；
+  - substitutions：输出文件名 Hash；
+    - chunkhash：解决缓存问题的最好方式，精确的定位到文件级别的 hash；
+    - contenthash：控制缓存，8位的 contenthash 是最好的方式；

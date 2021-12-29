@@ -610,3 +610,22 @@ var y = new Rectangle(3, 4);  // 正确
 ```
 
 注意，在函数外部，使用new.target会报错。
+
+### instanceof 实现
+
+```javascript
+// 判断一个实例是否是其父类或者祖先类型的实例
+let myInstanceof = (target, origin) => {
+  while(target){
+    if(target.__proto__ === origin.prototype){
+      return true
+    }
+    target = target.__proto__
+  }
+  return false
+}
+let a = [1, 2, 3]
+console.log(myInstanceof(a, Array)) // true
+console.log(myInstanceof(a, Object)) // true
+```
+
