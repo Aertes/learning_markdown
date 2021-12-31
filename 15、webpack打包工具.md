@@ -149,7 +149,7 @@
 
 ### 第四章：打包结果运行原理
 
-- ### 第五章：资源模块加载
+### 第五章：资源模块加载
 
 - 内部默认的 javascript 文件的 Loader 加载器；
 
@@ -215,8 +215,15 @@
   Plugin 通过钩子机制实现的：
   
   - webpack-plugin 必须是一个函数或者是一个包含 apply 方法的对象；
-  
   - 通过在 webpack 生命周期的钩子中挂载任务函数实现扩展
+  
+- webpack 内 rules 的常用属性和常用配置：
+  
+  具体取决于使用的 loader，每个 rule 对象中正常只会用到 test 和 use；
+  
+  - 如果这个 loader 需要设置一些配置选项，可以使用 options
+  - 如果需要让这个 loader 选择性忽略一部分文件，可以使用 include / exclude
+  - 如果需要对同一种文件使用多个 loader，例如先使用 eslint-loader 再使用 babel-loader，可以使用 enforce 属性控制当前这个规则的优先与否
 
 ### 第八章：webpack 中开发体验问题
 
