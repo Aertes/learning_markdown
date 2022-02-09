@@ -54,6 +54,7 @@
 ### 第四章：Vue Router
 
 - 基本使用：
+
 - Hash 和 History 模式：
   - Hash 模式：# 号
     - 是基于锚点，以及 onhashchange 事件
@@ -63,11 +64,78 @@
 
   - History 模式：
     - 基于 HTML5 中的 History API
+    
     - history.pushState() IE10 以后支持
+    
     - history.replaceState()
+    
     - 需要服务器的支持
+    
     - 在服务端应该除了静态资源外部都返回单页应用的 index.html
-    - 
+    
+    - History 模式的 Nginx
+    
+      ```shell
+      # 启动
+      start nginx
+      # 重启
+      nginx -s reload
+      # 停止
+      nginx -s stop
+      ```
+  
+- VueRouter 核心代码的实现：
+  
+  ```javascript
+  // router/index.js
+  // 注册插件
+  Vue.use(VueRouter)
+  // 创建路由对象
+  const router = new VueRouter({
+    routes: [
+      {
+        name: 'home',
+        path: '/',
+        component: homeComponent
+      }
+    ]
+  })
+  // mian.js
+  // 创建 Vue 实例， 注册 router 对象
+  new Vue({
+    router,
+    render: h => h(App)
+  }).$mount('#app')
+  ```
+  
+- 实现 vue-router 中的 install 方法
+
+  ```javascript
+  let _Vue = null
+  export default class VueRouter{
+    static install(Vue){
+      // 1.判断当前插件是否已经被安装
+      if(VueRouter.install.installed){
+        return
+      }
+      VueRouter.install.installed = true
+      // 2.把 Vue 构造函数记录到全局
+      _Vue = Vue
+      // 3.把创建Vue实例时候传入的 router 对象注入到Vue实例上
+      // 混入
+      _Vue.mixin({
+        beforeCreate(){
+          if($options.router){
+             _Vue.prototype.$router = this.$options.router
+          }
+        }
+      })
+      
+    }
+  }
+  ```
+
+  
 
 
 
