@@ -108,7 +108,7 @@
   }).$mount('#app')
   ```
   
-- 实现 vue-router 中的 install 方法
+- 模拟 vue-router 的实现：
 
   ```javascript
   let _Vue = null
@@ -127,12 +127,82 @@
         beforeCreate(){
           if($options.router){
              _Vue.prototype.$router = this.$options.router
+            this.$option.router.init()
           }
         }
       })
-      
+    }
+    constructor(options){
+      this.options = options
+      this.routerMap = {}
+      this.data = _Vue.observable({
+        current: '/'
+      })
+    }
+    init(){
+      this.createRouteMap()
+      this.initComponents(_Vue)
+      this.initEvent()
+    }
+    createRouteMap(){
+      this.options.routes.forEach(route => {
+        this.routerMap[route.path] = route.component
+      })
+    }
+    initComponents(Vue){
+      const self = this
+      Vue.component('router-link', {
+        props: {
+          to: String,
+        },
+        render(h) {
+          return h('a', {
+            attrs: {
+              href: this.to
+            },
+            on: {
+              click: this.clickHandler
+            }
+          }, [this.$slot.default])
+        }, // render 模式
+        // template: `<a :href='to' ><slot></slot></a>` 
+        method: {
+          clickHandler(e){
+            history.pushState({}, '', this.to)
+            this.$router.data.current = this.to
+            e.preventDefault()
+          }
+        }
+      })
+      Vue.component('router-view', {
+        render(h) {
+          const component = self.routerMap[self.data.current]
+          return h(component)
+        }
+      })
+    }
+    initEvent(){
+      window.addEventListener('popstate', () => {
+        this.data.current = window.location.pathname
+      })
     }
   }
+  ```
+  
+- 模拟 Vue 的响应式原理：Vue 2+ （Object.defineProperty)、Vue 3+（Proxy）
+
+  - 数据驱动
+
+  - 响应式核心原理
+
+    ![image-20220620163208538](files/img/vue%E5%93%8D%E5%BA%94%E5%BC%8F%E6%A0%B8%E5%BF%83%E5%8E%9F%E7%90%86.png)
+
+  - 发布订阅模式和观察者模式
+
+    ![image-20220620161839597](files/img/%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85%E5%92%8C%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F.png)
+
+  ```javascript
+  
   ```
 
   
